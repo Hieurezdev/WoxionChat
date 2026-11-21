@@ -1,0 +1,226 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}WoxionChat - Chat History{% endblock %}
+
+{% block content %}
+<div class="main-content-scroll" style="max-width: 900px;">
+    <!-- Page Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-heading">Chat history</h1>
+            <p class="page-subheading">24 conversations • Pick one up exactly where you left it.</p>
+        </div>
+        <div>
+            <a href="{% url 'chat_advanced' %}?new=1" class="btn-primary-yellow">
+                <i class="fas fa-plus"></i>
+                <span>New chat</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Bar with ⌘ K -->
+    <div class="history-search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="historySearchInput" class="history-search-input" placeholder="Search conversations..." oninput="filterHistoryCards(this.value)">
+        <span class="history-search-kbd">⌘ K</span>
+    </div>
+
+    <!-- Group: TODAY -->
+    <div class="history-section-group">
+        <div class="history-time-heading">Today</div>
+        <div class="history-cards-list">
+            <!-- Active Conversation Card -->
+            <a href="{% url 'chat_advanced' %}" class="history-card current">
+                <div class="history-card-icon">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Vendor agreement termination clauses</h4>
+                            <span class="badge-current-pill">CURRENT</span>
+                        </div>
+                        <span class="history-card-time">10:42</span>
+                    </div>
+                    <p class="history-card-snippet">Both agreements allow either party to terminate for convenience, but the notice and cure periods differ...</p>
+                    <div class="history-card-tags">
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-pdf" style="color: #dc2626;"></i>
+                            <span>Q3_Vendor_Agreement.pdf</span>
+                        </span>
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-pdf" style="color: #dc2626;"></i>
+                            <span>Master_Services_Agreement.pdf</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Other Conversation Card -->
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Data processing addendum review</h4>
+                        </div>
+                        <span class="history-card-time">08:15</span>
+                    </div>
+                    <p class="history-card-snippet">The addendum names three sub-processors and requires notice 30 days before any change...</p>
+                    <div class="history-card-tags">
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-word" style="color: #0284c7;"></i>
+                            <span>DPA_Northwind_v2.docx</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Group: YESTERDAY -->
+    <div class="history-section-group">
+        <div class="history-time-heading">Yesterday</div>
+        <div class="history-cards-list">
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Handbook PTO policy summary</h4>
+                        </div>
+                        <span class="history-card-time">10:30</span>
+                    </div>
+                    <p class="history-card-snippet">Full-time employees accrue 1.67 days of paid time off per month, capped at 30 days...</p>
+                    <div class="history-card-tags">
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-word" style="color: #0284c7;"></i>
+                            <span>Employee_Handbook_2024.docx</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Group: PREVIOUS 7 DAYS -->
+    <div class="history-section-group">
+        <div class="history-time-heading">Previous 7 days</div>
+        <div class="history-cards-list">
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Compare retention policies</h4>
+                        </div>
+                        <span class="history-card-time">Mon</span>
+                    </div>
+                    <p class="history-card-snippet">The 2023 policy retains financial records for 7 years, while the draft shortens this to 5...</p>
+                    <div class="history-card-tags">
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-pdf" style="color: #dc2626;"></i>
+                            <span>Data_Retention_Policy.pdf</span>
+                        </span>
+                        <span class="history-tag-chip">+1</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Board minutes action items</h4>
+                        </div>
+                        <span class="history-card-time">Sat</span>
+                    </div>
+                    <p class="history-card-snippet">Five action items were assigned; two are due before the November board meeting...</p>
+                    <div class="history-card-tags">
+                        <span class="history-tag-chip">
+                            <i class="far fa-file-pdf" style="color: #dc2626;"></i>
+                            <span>Board_Minutes_Aug.pdf</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Explain indemnification in plain language</h4>
+                        </div>
+                        <span class="history-card-time">Oct 8</span>
+                    </div>
+                    <p class="history-card-snippet">Indemnification means one party agrees to cover certain losses the other party suffers...</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Group: OLDER -->
+    <div class="history-section-group">
+        <div class="history-time-heading">Older</div>
+        <div class="history-cards-list">
+            <a href="{% url 'chat_advanced' %}" class="history-card">
+                <div class="history-card-icon">
+                    <i class="far fa-comment"></i>
+                </div>
+                <div class="history-card-content">
+                    <div class="history-card-header">
+                        <div class="history-card-title-row">
+                            <h4 class="history-card-title">Q2 procurement report highlights</h4>
+                        </div>
+                        <span class="history-card-time">Sep 21</span>
+                    </div>
+                    <p class="history-card-snippet">Spend rose 8% quarter over quarter, driven mostly by software licensing renewals...</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Load Older Conversations Button -->
+    <button type="button" class="btn-load-older">Load older conversations</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Keyboard shortcut for Cmd+K / Ctrl+K
+    document.addEventListener('keydown', function(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.getElementById('historySearchInput');
+            if (searchInput) searchInput.focus();
+        }
+    });
+});
+
+function filterHistoryCards(query) {
+    const q = query.toLowerCase();
+    const cards = document.querySelectorAll('.history-card');
+    cards.forEach(card => {
+        if (card.textContent.toLowerCase().includes(q)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,1208 +1,1225 @@
-{% extends 'accounts/base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoxionChat - Your Documents. Your Knowledge. Your AI.</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Woxion Theme CSS with cache buster -->
+    <link rel="stylesheet" href="{% static 'css/woxion.css' %}?v=20261120_v5">
 
-{% block title %}WoxionChat - AI Chatbot Platform{% endblock %}
+    <style>
+        /* Standalone Landing Page Styles - Ensures 100% reliable rendering without cache issues */
+        :root {
+            --bg-page: #faf8f3;
+            --text-main: #1f1f1f;
+            --text-secondary: #5f5f5f;
+            --text-muted: #8c8c8c;
+            --brand-yellow: #f5c842;
+            --brand-yellow-hover: #eab308;
+            --brand-yellow-soft: #fef9c3;
+            --brand-gold-border: #fcd34d;
+            --border-color: #eee8d8;
+            --border-subtle: #f5f0e3;
+            --border-strong: #d1c9b6;
+            --bg-card-subtle: #fdfbf7;
+            --bg-sidebar: #faf8f3;
+            --bg-sidebar-hover: #f3efe6;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 24px;
+            --radius-pill: 9999px;
+            --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.07);
+        }
 
-{% block content %}
-<style>
-    /* Video Background for entire page */
-    body {
-        position: relative;
-        overflow-x: hidden;
-    }
-    
-    .navbar {
-        display: none !important;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .video-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        object-fit: cover;
-    }
-    
-    .video-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(67, 107, 83, 0.4);
-        z-index: -1;
-    }
-    
-    .content-wrapper {
-        position: relative;
-        z-index: 1;
-        min-height: 100vh;
-        padding-top: 0;
-    }
-    
-    /* Introduction Section Styles */
-    .Introduction {
-        text-align: center;
-        padding: 60px 0;
-        margin-bottom: 40px;
-        position: relative;
-        z-index: 1;
-        animation: fadeInUp 0.8s ease-out;
-    }
-    
-    .hero-logo {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 24px;
-        animation: logoFloat 3s ease-in-out infinite;
-        filter: drop-shadow(0 10px 20px rgb(166, 232, 198));
-        opacity: 0.9;
-    }
-    
-    .hero-subtitle {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: rgb(255, 255, 255);
-        margin-bottom: 16px;
-        /* text-shadow: 0 4px 8px rgba(177, 250, 213, 0.5); */
-        animation: slideInUp 0.8s ease-out 0.2s both;
-    }
-    
-    .hero-description {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 0;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.6;
-        /* text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); */
-        animation: slideInUp 0.8s ease-out 0.4s both;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+        html {
+            scroll-behavior: smooth;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .main-card {
-        /* background: rgba(255, 255, 255, 0.89); */
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); */
-        padding: 48px 40px;
-        margin-bottom: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        animation: slideInUp 0.8s ease-out 0.6s both;
-    }
-    
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .feature-card {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        padding: 32px 24px;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        height: 100%;
-        animation: slideInUp 0.8s ease-out both;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-        background: rgba(255, 255, 255, 0.98);
-    }
-    
-    .feature-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 24px;
-        font-size: 2rem;
-        color: white;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .feature-icon::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    .feature-card:hover .feature-icon::before {
-        left: 100%;
-    }
-    
-    .feature-icon.security { background: linear-gradient(135deg, #10a37f, #15b887); }
-    .feature-icon.mobile { background: linear-gradient(135deg, #059669, #047857); }
-    .feature-icon.easy { background: linear-gradient(135deg, #16a34a, #15803d); }
-    .feature-icon.ai { background: linear-gradient(135deg, #22c55e, #16a34a); }
-    
-    .feature-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 12px;
-    }
-    
-    .feature-description {
-        color: #6b7280;
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        flex-wrap: wrap;
-        animation: fadeInUp 1s ease-out 0.8s both;
-    }
-    
-    .btn-primary-custom {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        border: none;
-        color: white;
-        padding: 16px 32px;
-        border-radius: 10px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 20px rgba(16, 163, 127, 0.4);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .btn-primary-custom::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    .btn-primary-custom:hover::before {
-        left: 100%;
-    }
-    
-    .btn-primary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(16, 163, 127, 0.5);
-        color: white;
-    }
-    
-    .btn-secondary-custom {
-        background: rgba(248, 250, 252, 0.95);
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(226, 232, 240, 0.5);
-        color: #374151;
-        padding: 14px 30px;
-        border-radius: 10px;
-        font-size: 1.1rem;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-secondary-custom:hover {
-        background: #10a37f;
-        border-color: #10a37f;
-        transform: translateY(-2px);
-        color: white;
-        box-shadow: 0 10px 30px rgba(16, 163, 127, 0.4);
-    }
-    
-    .user-welcome {
-        /* backdrop-filter: blur(10px); */
-        color: white;
-        padding: 24px 32px;
-        border-radius: 10px;
-        margin-bottom: 32px;
-        text-align: center;
-        transition: all 0.3s ease;
-        width: 100%;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
 
-    
-    .user-welcome h3 {
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-    
-    .user-welcome p {
-        margin: 0;
-        opacity: 0.9;
-    }
-    
-    .stats-section {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        padding: 32px;
-        margin-top: 40px;
-        animation: slideInUp 0.8s ease-out 0.8s both;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 24px 16px;
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #10a37f;
-        margin-bottom: 8px;
-    }
-    
-    .stat-label {
-        color: #6b7280;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    
-    .tech-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(240, 253, 244, 0.95);
-        backdrop-filter: blur(5px);
-        color: #16a34a;
-        padding: 8px 16px;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin: 4px;
-        border: 1px solid rgba(187, 247, 208, 0.5);
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .Introduction {
-            padding: 40px 0;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        
-        .hero-logo {
-            width: 100px;
-            height: 100px;
+
+        a {
+            color: inherit;
+            text-decoration: none;
         }
-        
-        .hero-subtitle {
-            font-size: 2rem;
+
+        /* Top Navigation */
+        .landing-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: rgba(250, 248, 243, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        
-        .hero-description {
-            font-size: 1.1rem;
-            padding: 0 20px;
+
+        .landing-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
         }
-        
-        .main-card {
-            padding: 32px 24px;
-            border-radius: 10px;
+
+        .brand-logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(245, 166, 35, 0.25);
         }
-        
-        .action-buttons {
-            flex-direction: column;
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .landing-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .landing-nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 0.15s ease;
+        }
+
+        .landing-nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .landing-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .btn-nav-signin {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: opacity 0.15s ease;
+        }
+
+        .btn-nav-signin:hover {
+            opacity: 0.8;
+        }
+
+        .btn-nav-getstarted {
+            background-color: var(--brand-yellow);
+            color: var(--text-main);
+            padding: 9px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(245, 200, 66, 0.3);
+            transition: all 0.15s ease;
+            display: inline-flex;
             align-items: center;
         }
-        
-        .btn-primary-custom,
-        .btn-secondary-custom {
-            width: 100%;
-            max-width: 300px;
-            justify-content: center;
-        }
-        
-        .content-wrapper {
-            padding-top: 20px;
-        }
-    }
-    
-    /* Animation delays for feature cards */
-    .feature-card:nth-child(1) { animation-delay: 0.9s; }
-    .feature-card:nth-child(2) { animation-delay: 1.1s; }
-    .feature-card:nth-child(3) { animation-delay: 1.3s; }
-    .feature-card:nth-child(4) { animation-delay: 1.5s; }
-    
-    /* Info Section Styles */
-    .info-section {
-        background: transparent;
-        backdrop-filter: blur(10px);
-        padding: 60px 0;
-        border-radius: 24px;
-        margin: 40px 20px 20px;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-    
-    .info-section::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(16, 163, 127, 0.1) 0%, transparent 70%);
-        animation: float 6s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(10deg); }
-    }
-    
-    .info-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 16px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .info-subtitle {
-        font-size: 1.2rem;
-        color: #ffffff;
-        margin-bottom: 0;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .info-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 32px 24px;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        height: 100%;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .info-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-        background: rgba(255, 255, 255, 0.98);
-    }
-    
-    .info-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 1.8rem;
-        color: white;
-    }
-    
-    .info-icon.platform { background: linear-gradient(135deg, #10a37f, #15b887); }
-    .info-icon.features { background: linear-gradient(135deg, #059669, #047857); }
-    .info-icon.contact { background: linear-gradient(135deg, #16a34a, #15803d); }
-    
-    .info-card h4 {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 20px;
-    }
-    
-    .info-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        text-align: left;
-    }
-    
-    .info-list li {
-        padding: 8px 0;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .info-list li i {
-        color: #10a37f;
-        font-size: 0.9rem;
-        width: 16px;
-    }
-    
-    .additional-info-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 2;
-    }
-    
-    .additional-info-card h3 {
-        color: #1f2937;
-        font-weight: 600;
-        margin-bottom: 16px;
-    }
-    
-    .additional-info-card p {
-        color: #6b7280;
-        line-height: 1.6;
-        font-size: 1.05rem;
-    }
-    
-    .highlight-features {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 20px;
-    }
-    
-    .highlight-badge {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .version-info {
-        text-align: center;
-    }
-    
-    .version-badge {
-        background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(55, 65, 81, 0.95));
-        backdrop-filter: blur(10px);
-        color: white;
-        padding: 20px;
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .version-badge i {
-        font-size: 1.5rem;
-    }
-    
-    .version-badge strong {
-        display: block;
-        font-size: 1.1rem;
-    }
-    
-    .version-badge small {
-        display: block;
-        opacity: 0.8;
-        font-size: 0.8rem;
-    }
-    
-    .social-links {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-    }
-    
-    .social-link {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: rgba(248, 250, 252, 0.95);
-        backdrop-filter: blur(5px);
-        color: #6b7280;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(226, 232, 240, 0.5);
-    }
-    
-    .social-link:hover {
-        background: #10a37f;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 163, 127, 0.3);
-    }
-    
-    /* Map Section */
-    .map-section {
-        background: linear-gradient(135deg, rgba(48, 147, 99, 0.95), rgba(55, 65, 81, 0.95));
-        backdrop-filter: blur(10px);
-        padding: 80px 0;
-        margin-top: 60px;
-        position: relative;
-        overflow: hidden;
-        border-radius: 24px;
-        margin-left: 20px;
-        margin-right: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    }
 
-    .map-section::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(16, 163, 127, 0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
+        .btn-nav-getstarted:hover {
+            background-color: var(--brand-yellow-hover);
+            transform: translateY(-1px);
+        }
 
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .map-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 16px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .map-subtitle {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 0;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .map-container {
-        position: relative;
-        z-index: 2;
-    }
-    
-    .map-wrapper {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 12px;
-        border-radius: 20px;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .map-wrapper:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-    }
-    
-    .contact-info-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 32px;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
-        position: relative;
-        z-index: 2;
-        height: fit-content;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .contact-info-card h4 {
-        color: #1f2937;
-        font-weight: 600;
-        margin-bottom: 24px;
-        font-size: 1.3rem;
-    }
-    
-    .contact-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(241, 245, 249, 0.5);
-    }
-    
-    .contact-item:last-of-type {
-        border-bottom: none;
-        margin-bottom: 32px;
-    }
-    
-    .contact-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-    
-    .contact-details strong {
-        color: #1f2937;
-        font-weight: 600;
-        display: block;
-        margin-bottom: 4px;
-    }
-    
-    .contact-details p {
-        color: #6b7280;
-        margin: 0;
-        line-height: 1.5;
-    }
-    
-    .contact-details a {
-        color: #10a37f;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    
-    .contact-details a:hover {
-        color: #0d8f69;
-        text-decoration: underline;
-    }
-    
-    .contact-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-    
-    .contact-btn {
-        flex: 1;
-        padding: 12px 20px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        min-width: 120px;
-    }
-    
-    .call-btn {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-    }
-    
-    .call-btn:hover {
-        background: linear-gradient(135deg, #059669, #047857);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
-        color: white;
-    }
-    
-    .email-btn {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-    }
-    
-    .email-btn:hover {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-        color: white;
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .map-section {
-            padding: 60px 0;
-            margin-top: 40px;
-        }
-        
-        .map-title {
-            font-size: 2rem;
-        }
-        
-        .map-subtitle {
-            font-size: 1.1rem;
-        }
-        
-        .contact-info-card {
-            padding: 24px;
-            margin-top: 32px;
-        }
-        
-        .contact-actions {
-            flex-direction: column;
-        }
-        
-        .contact-btn {
-            min-width: auto;
-        }
-        
-        .map-wrapper iframe {
-            height: 300px;
-        }
-        
-        .info-section {
-            margin: 20px 10px 10px;
-            padding: 40px 0;
-        }
-        
-        .info-title {
-            font-size: 2rem;
-        }
-        
-        .info-subtitle {
-            font-size: 1.1rem;
-        }
-        
-        .additional-info-card {
-            padding: 24px;
-        }
-        
-        .highlight-features {
-            justify-content: center;
-        }
-        
-        .version-badge {
-            padding: 16px;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .contact-item {
-            flex-direction: column;
+        /* SECTION 1: HERO */
+        .landing-hero-section {
+            padding: 70px 20px 50px;
             text-align: center;
-            gap: 12px;
-        }
-        
-        .contact-icon {
+            max-width: 1200px;
             margin: 0 auto;
         }
-    }
-</style>
 
-<!-- Video Background -->
-<video class="video-background" autoplay muted loop playsinline>
-    <source src="{% static 'videos/illus.mp4' %}" type="video/mp4">
-</video>
-<div class="video-overlay"></div>
+        .hero-calm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
 
-<!-- Content Wrapper -->
-<div class="content-wrapper">
-    <!-- Introduction Section -->
-    <div class="Introduction">
-        <img src="{% static 'images/logoxx.png' %}" alt="WoxionChat Logo" class="hero-logo">
-        <p class="hero-subtitle">𝕎𝕠𝕩𝕚𝕠𝕟ℂ𝕙𝕒𝕥</p>
-        <p class="hero-description">
-            Nền tảng chatbot thông minh với hệ thống xác thực an toàn, giao diện hiện đại và khả năng mở rộng cao 
+        .hero-calm-bars {
+            color: #d97706;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero-main-title {
+            font-size: 3.8rem;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.12;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        .hero-main-desc {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 680px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-cta-btns {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 50px;
+        }
+
+        .btn-hero-start {
+            background-color: var(--brand-yellow);
+            color: var(--text-main);
+            padding: 12px 26px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(245, 200, 66, 0.35);
+            transition: all 0.15s ease;
+        }
+
+        .btn-hero-start:hover {
+            background-color: var(--brand-yellow-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-hero-explore {
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-hero-explore:hover {
+            background-color: var(--bg-sidebar-hover);
+            border-color: var(--border-strong);
+        }
+
+        /* Hero Embedded Preview Mockup */
+        .hero-mockup-wrapper {
+            max-width: 960px;
+            margin: 0 auto;
+            border-radius: 20px;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .mockup-inner-grid {
+            display: grid;
+            grid-template-columns: 210px 1fr;
+            min-height: 480px;
+        }
+
+        .mockup-sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mockup-main-chat {
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+        }
+
+        .citation-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
+            background-color: var(--brand-yellow);
+            color: var(--text-main);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .source-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #fffdf5;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        /* SECTIONS COMMON */
+        .landing-section {
+            padding: 90px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #b45309;
+            margin-bottom: 8px;
+        }
+
+        .section-heading {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .section-subheading {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+        }
+
+        /* SECTION 2: FEATURES GRID (6 CARDS) */
+        .features-grid-6 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature-box-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 26px 22px;
+            box-shadow: var(--shadow-xs);
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .feature-box-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--brand-gold-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-box-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: #fff9e6;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: 14px;
+        }
+
+        .feature-box-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .feature-box-desc {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* SECTION 3: 3 SIMPLE STEPS */
+        .steps-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .step-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-illustration-box {
+            background-color: var(--bg-card-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+
+        .step-num-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #d97706;
+            margin-bottom: 4px;
+        }
+
+        .step-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .step-card-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* SECTION 4: USE CASES (4 CARDS) */
+        .usecases-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .usecase-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 26px 20px;
+            box-shadow: var(--shadow-xs);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .usecase-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--brand-gold-border);
+        }
+
+        .usecase-icon {
+            font-size: 1.4rem;
+            color: var(--text-main);
+            margin-bottom: 14px;
+        }
+
+        .usecase-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .usecase-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* SECTION 5: ABOUT WOXIONCHAT */
+        .about-2col-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .about-checklist {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .about-check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .about-check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--brand-yellow);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .mission-vision-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mission-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .mission-card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #fff9e6;
+            color: #b45309;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .mission-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .mission-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* SECTION 6: CONTACT */
+        .contact-2col-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .contact-info-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .contact-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 18px;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .contact-form-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-2xl);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-row-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-control-warm {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.15s, background-color 0.15s;
+            font-family: inherit;
+        }
+
+        .form-control-warm:focus {
+            border-color: var(--brand-gold-border);
+            background-color: #ffffff;
+        }
+
+        .btn-start-chat {
+            background-color: var(--text-main);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-start-chat:hover {
+            background-color: #383838;
+        }
+
+        .woxion-alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .woxion-alert.success {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        /* SECTION 7: FOOTER */
+        .landing-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 50px 40px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 36px;
+        }
+
+        .footer-links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-links-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links-col a {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            transition: color 0.15s;
+        }
+
+        .footer-links-col a:hover {
+            color: var(--text-main);
+        }
+
+        .footer-bottom-row {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 1024px) {
+            .features-grid-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .usecases-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .about-2col-grid, .contact-2col-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .landing-nav {
+                padding: 12px 16px;
+            }
+            .landing-nav-links {
+                display: none;
+            }
+            .hero-main-title {
+                font-size: 2.5rem;
+            }
+            .mockup-inner-grid {
+                grid-template-columns: 1fr;
+            }
+            .mockup-sidebar {
+                display: none;
+            }
+            .features-grid-6, .steps-grid-3, .usecases-grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .form-row-2col {
+                grid-template-columns: 1fr;
+            }
+            .landing-footer {
+                padding: 30px 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="landing-body">
+    <!-- Top Navigation Bar -->
+    <nav class="landing-nav">
+        <a href="{% url 'home' %}" class="landing-brand">
+            <img src="{% static 'images/woxion-icon.png' %}" alt="WoxionChat" class="brand-logo-img" width="32" height="32" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+            <span class="brand-title">WoxionChat</span>
+        </a>
+
+        <ul class="landing-nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How it works</a></li>
+            <li><a href="#use-cases">Use cases</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <div class="landing-nav-actions">
+            {% if request.session.is_authenticated or user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn-nav-signin">Dashboard</a>
+                <a href="{% url 'chat_advanced' %}?new=1" class="btn-nav-getstarted">Open Chat</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-nav-signin">Sign in</a>
+                <a href="{% url 'register' %}" class="btn-nav-getstarted">Get Started</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- SECTION 1: HERO (Mockup 1) -->
+    <section class="landing-hero-section">
+        <div class="hero-calm-badge">
+            <span class="hero-calm-bars">||</span>
+            <span>A calm workspace for your documents</span>
+        </div>
+
+        <h1 class="hero-main-title">
+            Your Documents. Your<br>Knowledge. Your AI.
+        </h1>
+
+        <p class="hero-main-desc">
+            Upload your files, ask questions in plain language, and get clear answers that point back to the exact page they came from. No searching through long documents.
         </p>
-    </div>
 
-    <div class="container">
-        {% if user %}
-            <div class="user-welcome">
-                <h3>
-                    <i class="fas fa-user-check me-2"></i>
-                    Chào mừng trở lại, {{ user.first_name }} {{ user.last_name }}!
-                </h3>
-                <p>Vai trò: <strong>{{ user.get_role_display }}</strong></p>
-            </div>
-        {% endif %}
-        
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-7">
-                <div class="main-card">
-                    {% if user %}
-                        <div class="text-center mb-4">
-                            <h2 style="color: #ffffff; font-weight: 600; margin-bottom: 24px;">
-                                Sẵn sàng bắt đầu cuộc trò chuyện?
-                            </h2>
-                            <p style="color: #ffffff; font-size: 1.1rem; margin-bottom: 32px;">
-                                Khám phá sức mạnh của AI với WoxionChat
-                            </p>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <a href="{% url 'dashboard' %}" class="btn-primary-custom">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                            </a>
-                            <a href="{% url 'chat_advanced' %}" class="btn-primary-custom">
-                                <i class="fas fa-rocket me-2"></i>
-                                Bắt đầu Chat
-                            </a>
-                            {% if user.is_admin %}
-                                <a href="{% url 'admin_dashboard' %}" class="btn-primary-custom" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
-                                    <i class="fas fa-crown"></i>
-                                    Admin Panel
-                                </a>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="text-center mb-4">
-                            <h2 style="color: #28ac63; font-weight: 600; margin-bottom: 24px;">
-                                Trải nghiệm AI Chatbot thế hệ mới
-                            </h2>
-                            <p style="color: #ffffff; font-size: 1.1rem; margin-bottom: 32px;">
-                                Đăng nhập để khám phá các tính năng AI mạnh mẽ và giao diện thân thiện
-                            </p>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <a href="{% url 'login' %}" class="btn-primary-custom">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Đăng nhập
-                            </a>
-                            <a href="{% url 'register' %}" class="btn-secondary-custom">
-                                <i class="fas fa-user-plus"></i>
-                                Tạo tài khoản
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="hero-cta-btns">
+            <a href="{% url 'register' %}" class="btn-hero-start">
+                <span>Get Started</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="#features" class="btn-hero-explore">
+                <span>Explore Features</span>
+            </a>
         </div>
-        
-        <!-- Features Section -->
-        <div class="row g-4 mb-5">
-            <div class="col-lg-3 col-md-6">
-                <div class="feature-card">
-                    <div class="feature-icon security">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h4 class="feature-title">Bảo mật cao</h4>
-                    <p class="feature-description">
-                        Hệ thống xác thực đa lớp với mã hóa an toàn, bảo vệ dữ liệu người dùng tuyệt đối
-                    </p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="feature-card">
-                    <div class="feature-icon mobile">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h4 class="feature-title">Responsive Design</h4>
-                    <p class="feature-description">
-                        Giao diện thích ứng hoàn hảo trên mọi thiết bị từ desktop đến smartphone
-                    </p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="feature-card">
-                    <div class="feature-icon easy">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <h4 class="feature-title">Dễ sử dụng</h4>
-                    <p class="feature-description">
-                        Giao diện trực quan, không cần học tập phức tạp
-                    </p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="feature-card">
-                    <div class="feature-icon ai">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h4 class="feature-title">AI Thông minh</h4>
-                    <p class="feature-description">
-                        Chatbot AI có khả năng hiểu ngữ cảnh và phản hồi tự nhiên
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Stats Section -->
-        {% if user and user.is_admin %}
-        <div class="stats-section">
-            <h3 style="text-align: center; color: #1f2937; margin-bottom: 32px; font-weight: 600;">
-                <i class="fas fa-chart-line me-2"></i>Thống kê hệ thống
-            </h3>
-            <div class="row">
-                <div class="col-6 col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">{{ total_users|default:0 }}</div>
-                        <div class="stat-label">Người dùng</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">{{ active_sessions|default:0 }}</div>
-                        <div class="stat-label">Phiên hoạt động</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">
-                            <i class="fas fa-check-circle" style="color: #10a37f;"></i>
-                        </div>
-                        <div class="stat-label">Hệ thống</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">
-                            <i class="fas fa-check-circle" style="color: #10a37f;"></i>
-                        </div>
-                        <div class="stat-label">Online</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- Information Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="info-section">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-8 mx-auto text-center mb-5">
-                            <h2 class="info-title">
-                                <i class="fas fa-info-circle me-3"></i>Thông tin chi tiết về WoxionChat
-                            </h2>
-                            <p class="info-subtitle">
-                                Tìm hiểu thêm về nền tảng AI chatbot hàng đầu
-                            </p>
-                        </div>
+        <!-- Embedded Interactive Workspace Mockup Card -->
+        <div class="hero-mockup-wrapper">
+            <div class="mockup-inner-grid">
+                <!-- Mini Sidebar -->
+                <div class="mockup-sidebar">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <img src="{% static 'images/woxion-icon.png' %}" alt="W" width="26" height="26" style="width: 26px; height: 26px; border-radius: 6px; object-fit: cover; flex-shrink: 0;">
+                        <strong style="font-size: 0.95rem; color: var(--text-main);">WoxionChat</strong>
                     </div>
-                    
-                    <div class="row g-4 mb-5">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="info-card">
-                                <div class="info-icon platform">
-                                    <i class="fas fa-cogs"></i>
-                                </div>
-                                <h4>Nền tảng công nghệ</h4>
-                                <ul class="info-list">
-                                    <li><i class="fas fa-check"></i> Django Framework</li>
-                                    <li><i class="fas fa-check"></i> NoSQL Database</li>
-                                    <li><i class="fas fa-check"></i> Bootstrap 5 UI</li>
-                                    <li><i class="fas fa-check"></i> AI Integration Ready</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-4 col-md-6">
-                            <div class="info-card">
-                                <div class="info-icon features">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <h4>Tính năng nổi bật</h4>
-                                <ul class="info-list">
-                                    <li><i class="fas fa-check"></i> Chat AI thông minh</li>
-                                    <li><i class="fas fa-check"></i> Quản lý người dùng</li>
-                                    <li><i class="fas fa-check"></i> Dashboard trực quan</li>
-                                    <li><i class="fas fa-check"></i> Admin Panel mạnh mẽ</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-4 col-md-6">
-                            <div class="info-card">
-                                <div class="info-icon contact">
-                                    <i class="fas fa-headset"></i>
-                                </div>
-                                <h4>Hỗ trợ khách hàng</h4>
-                                <ul class="info-list">
-                                    <li><i class="fas fa-envelope"></i>triplehptit2005@gmail.com</li>
-                                    <li><i class="fas fa-phone"></i>0913 297 667</li>
-                                    <li><i class="fas fa-clock"></i> 24/7 Support</li>
-                                    <li><i class="fas fa-globe"></i> Hỗ trợ tiếng Việt</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="additional-info-card">
-                                <div class="row align-items-center">
-                                    <div class="col-lg-8">
-                                        <h3><i class="fas fa-rocket me-2"></i>Tại sao chọn WoxionChat?</h3>
-                                        <p class="mb-3">
-                                            WoxionChat là nền tảng AI chatbot được thiết kế để mang lại trải nghiệm tương tác tự nhiên và thông minh nhất. 
-                                            Đảm bảo dữ liệu hoàn toàn bảo mật và an toàn.
-                                        </p>
-                                        <div class="highlight-features">
-                                            <span class="highlight-badge"><i class="fas fa-shield-alt"></i> Bảo mật tuyệt đối</span>
-                                            <span class="highlight-badge"><i class="fas fa-lightning-bolt"></i> Phản hồi nhanh</span>
-                                            <span class="highlight-badge"><i class="fas fa-users"></i> Cộng đồng lớn</span>
-                                            <span class="highlight-badge"><i class="fas fa-award"></i> Chất lượng cao</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 text-center">
-                                        <div class="version-info">
-                                            <div class="version-badge">
-                                                <i class="fas fa-code-branch"></i>
-                                                <div>
-                                                    <strong>Version 1.0</strong>
-                                                    <small>Latest Stable</small>
-                                                </div>
-                                            </div>
-                                            <div class="social-links mt-3">
-                                                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-                                                <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                                                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Map Section -->
-    <div class="map-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center mb-5">
-                    <h2 class="map-title">
-                        <i class="fas fa-map-marker-alt me-3"></i>Vị trí & Liên hệ
-                    </h2>
-                    <p class="map-subtitle">
-                        Hãy liên hệ với chúng tôi hoặc đến thăm văn phòng
-                    </p>
-                </div>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="map-container">
-                        <div class="map-wrapper">
-                            <!-- Google Maps Embed - Replace with your actual location -->
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7169.147079132304!2d105.78128200803242!3d20.980582065451873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd8a1ad71%3A0xa2f9b16036648187!2zSOG7jWMgdmnhu4duIEPDtG5nIG5naOG7hyBCxrF1IGNow61uaCB2aeG7hW4gdGjDtG5n!5e0!3m2!1svi!2s!4v1749875599444!5m2!1svi!2s"
-                                width="100%" 
-                                height="400" 
-                                style="border:0; border-radius: 16px;" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
+                    <div style="background-color: var(--brand-yellow); border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; font-weight: 600; text-align: center; margin-bottom: 16px; cursor: pointer;">
+                        + New chat
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        <div style="padding: 6px 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-home" style="font-size: 0.75rem;"></i> Home
+                        </div>
+                        <div style="padding: 6px 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="far fa-comments" style="font-size: 0.75rem;"></i> Chat history
+                        </div>
+                        <div style="background-color: #fef08a; color: var(--text-main); font-weight: 600; padding: 6px 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="far fa-folder" style="font-size: 0.75rem;"></i> Documents
+                        </div>
+                        <div style="padding: 6px 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-cog" style="font-size: 0.75rem;"></i> Settings
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; padding: 0 4px;">
+                        Recent
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem; color: var(--text-secondary);">
+                        <div style="padding: 4px 6px; border-radius: 4px; background-color: var(--brand-yellow-soft); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            Vendor agreement terminat...
+                        </div>
+                        <div style="padding: 4px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            Handbook PTO policy sum...
+                        </div>
+                        <div style="padding: 4px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            Compare retention policies
                         </div>
                     </div>
                 </div>
-                
-                <div class="col-lg-4">
-                    <div class="contact-info-card">
-                        <h4><i class="fas fa-building me-2"></i>Thông tin liên hệ</h4>
-                        
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="contact-details">
-                                <strong>Địa chỉ</strong>
-                                <p>Học viện Công nghệ Bưu chính Viễn thông</p>
+
+                <!-- Mini Main Chat -->
+                <div class="mockup-main-chat" style="padding: 18px 24px;">
+                    <!-- Chat Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 18px;">
+                        <strong style="font-size: 0.95rem; color: var(--text-main);">Vendor agreement termination clauses</strong>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-card-subtle); border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 12px;">2 documents</span>
+                    </div>
+
+                    <!-- User Message Bubble -->
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <div style="background-color: var(--brand-yellow-soft); border-radius: 14px 14px 2px 14px; padding: 10px 16px; max-width: 80%; font-size: 0.85rem; line-height: 1.45; color: var(--text-main);">
+                            What are the termination terms in the vendor agreement, and how do they compare to our master services agreement?
+                        </div>
+                    </div>
+
+                    <!-- Assistant Response -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <img src="{% static 'images/woxion-icon.png' %}" alt="W" width="24" height="24" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover; flex-shrink: 0; margin-top: 2px;">
+                        <div style="font-size: 0.85rem; line-height: 1.5; color: #2b2b2b;">
+                            <strong style="display: block; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-main);">Termination terms at a glance</strong>
+                            <p style="margin-bottom: 8px;">Both agreements allow either party to end the contract for convenience, but the notice periods differ.</p>
+                            <p style="margin-bottom: 4px;">• <strong>For convenience:</strong> 90 days' written notice <span class="citation-badge">1</span></p>
+                            <p style="margin-bottom: 10px;">• <strong>For cause:</strong> 30-day cure period after written notice <span class="citation-badge">2</span></p>
+
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="source-chip" style="font-size: 0.72rem; padding: 2px 8px;">
+                                    <i class="far fa-file-pdf" style="color: #dc2626;"></i> Q3_Vendor_Agreement.pdf
+                                </span>
+                                <span class="source-chip" style="font-size: 0.72rem; padding: 2px 8px;">
+                                    <i class="far fa-file-pdf" style="color: #dc2626;"></i> Master_Services_Agreement.pdf
+                                </span>
                             </div>
                         </div>
-                        
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-details">
-                                <strong>Điện thoại</strong>
-                                <p><a href="tel:0913297667">0913 297 667</a></p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="contact-details">
-                                <strong>Email</strong>
-                                <p><a href="mailto:triplehptit2005@gmail.com">triplehptit2005@gmail.com</a></p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="contact-details">
-                                <strong>Giờ làm việc</strong>
-                                <p>Thứ 2 - Thứ 6: 8:00 - 17:30<br>Thứ 7: 8:00 - 12:00<br>Chủ nhật: Nghỉ</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-actions">
-                            <a href="tel:0913297667" class="contact-btn call-btn">
-                                <i class="fas fa-phone"></i>
-                                Gọi ngay
-                            </a>
-                            <a href="mailto:triplehptit2005@gmail.com" class="contact-btn email-btn">
-                                <i class="fas fa-envelope"></i>
-                                Gửi email
-                            </a>
+                    </div>
+
+                    <!-- Input Mockup -->
+                    <div style="margin-top: auto; border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; background: #fff;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">Ask a follow-up...</span>
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--brand-yellow); display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                            ↑
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- SECTION 2: FEATURES (Mockup 2) -->
+    <section class="landing-section" id="features">
+        <div class="section-label">Features</div>
+        <h2 class="section-heading">Everything you need to work with your files</h2>
+        <p class="section-subheading">Simple tools that help you understand your documents faster.</p>
+
+        <div class="features-grid-6">
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="far fa-comment-dots"></i>
+                </div>
+                <h3 class="feature-box-title">Chat with Documents</h3>
+                <p class="feature-box-desc">Talk to your files like you would to a helpful colleague who has read everything.</p>
+            </div>
+
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="far fa-question-circle"></i>
+                </div>
+                <h3 class="feature-box-title">Ask Questions</h3>
+                <p class="feature-box-desc">Type your question in everyday words. Answers show where they came from.</p>
+            </div>
+
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="fas fa-align-left"></i>
+                </div>
+                <h3 class="feature-box-title">Quick Summaries</h3>
+                <p class="feature-box-desc">Get the key points of a long document in a few short paragraphs.</p>
+            </div>
+
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-box-title">Find Information Easily</h3>
+                <p class="feature-box-desc">Look up dates, names, figures and details without scrolling page after page.</p>
+            </div>
+
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="feature-box-title">Conversation History</h3>
+                <p class="feature-box-desc">Pick up exactly where you left off. Your past chats are saved and searchable.</p>
+            </div>
+
+            <div class="feature-box-card">
+                <div class="feature-box-icon">
+                    <i class="far fa-folder"></i>
+                </div>
+                <h3 class="feature-box-title">Document Management</h3>
+                <p class="feature-box-desc">Upload, organise and choose which files each chat should use.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: HOW IT WORKS (Mockup 2) -->
+    <section class="landing-section" id="how-it-works" style="padding-top: 40px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div class="section-label">How it works</div>
+            <h2 class="section-heading">Three simple steps</h2>
+        </div>
+
+        <div class="steps-grid-3">
+            <!-- Step 1 -->
+            <div class="step-card">
+                <div class="step-illustration-box">
+                    <div style="border: 1px dashed #d1c9b6; border-radius: 8px; padding: 20px 24px; text-align: center; background: #fff; width: 100%;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; color: #9a6538; margin-bottom: 6px; display: block;"></i>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Drag and drop files here</span>
+                    </div>
+                </div>
+                <span class="step-num-label">Step 1</span>
+                <h3 class="step-card-title">Upload your documents</h3>
+                <p class="step-card-desc">Add PDFs, Word files, text files or scanned images.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+                <div class="step-illustration-box">
+                    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                        <div style="align-self: flex-end; background-color: var(--brand-yellow-soft); border-radius: 12px; padding: 4px 12px; font-size: 0.72rem; font-weight: 500;">
+                            Summarize my document
+                        </div>
+                        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+                            <span>Ask anything about your documents...</span>
+                            <span style="background: var(--brand-yellow); width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #000;">↑</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="step-num-label">Step 2</span>
+                <h3 class="step-card-title">Ask questions</h3>
+                <p class="step-card-desc">Type what you want to know in plain language.</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <div class="step-illustration-box">
+                    <div style="background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                            <img src="{% static 'images/woxion-icon.png' %}" alt="W" width="18" height="18" style="width: 18px; height: 18px; border-radius: 4px; object-fit: cover;">
+                            <div style="height: 6px; width: 60px; background: #e5e0d3; border-radius: 4px;"></div>
+                        </div>
+                        <div style="height: 5px; width: 85%; background: #eee8d8; border-radius: 4px; margin-bottom: 4px;"></div>
+                        <div style="height: 5px; width: 70%; background: #eee8d8; border-radius: 4px; margin-bottom: 8px;"></div>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; background: #fffdf5; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary);">
+                            <i class="far fa-file-alt" style="font-size: 0.6rem;"></i> Source • page 14
+                        </span>
+                    </div>
+                </div>
+                <span class="step-num-label">Step 3</span>
+                <h3 class="step-card-title">Get useful answers</h3>
+                <p class="step-card-desc">Read clear answers and check the source they came from.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: USE CASES (Mockup 3) -->
+    <section class="landing-section" id="use-cases">
+        <div class="section-label">Use cases</div>
+        <h2 class="section-heading">Made for the way you work</h2>
+
+        <div class="usecases-grid-4">
+            <div class="usecase-card">
+                <div class="usecase-icon"><i class="fas fa-graduation-cap"></i></div>
+                <h3 class="usecase-title">Students</h3>
+                <p class="usecase-desc">Understand lecture notes and readings, and prepare for exams faster.</p>
+            </div>
+
+            <div class="usecase-card">
+                <div class="usecase-icon"><i class="fas fa-briefcase"></i></div>
+                <h3 class="usecase-title">Office Workers</h3>
+                <p class="usecase-desc">Check policies, contracts and meeting notes without reading every page.</p>
+            </div>
+
+            <div class="usecase-card">
+                <div class="usecase-icon"><i class="fas fa-flask"></i></div>
+                <h3 class="usecase-title">Researchers</h3>
+                <p class="usecase-desc">Compare papers and pull out the details you need, with sources.</p>
+            </div>
+
+            <div class="usecase-card">
+                <div class="usecase-icon"><i class="far fa-smile"></i></div>
+                <h3 class="usecase-title">Everyday Users</h3>
+                <p class="usecase-desc">Make sense of bills, manuals and forms in simple words.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: ABOUT WOXIONCHAT (Mockup 3) -->
+    <section class="landing-section" id="about">
+        <div class="about-2col-grid">
+            <!-- Left Info -->
+            <div>
+                <div class="section-label">About WoxionChat</div>
+                <h2 class="section-heading" style="margin-bottom: 18px;">Documents should be easy to understand</h2>
+                <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 14px;">
+                    WoxionChat is a simple workspace where you upload your documents and chat with them. Instead of reading page after page, you ask a question and get a clear answer, with a link back to the source.
+                </p>
+                <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 24px;">
+                    Everything stays in one calm place: your files, your questions and your past conversations.
+                </p>
+
+                <ul class="about-checklist">
+                    <li class="about-check-item">
+                        <span class="about-check-icon"><i class="fas fa-check"></i></span>
+                        <span>Save time finding what matters</span>
+                    </li>
+                    <li class="about-check-item">
+                        <span class="about-check-icon"><i class="fas fa-check"></i></span>
+                        <span>Check every answer against its source</span>
+                    </li>
+                    <li class="about-check-item">
+                        <span class="about-check-icon"><i class="fas fa-check"></i></span>
+                        <span>Keep all your documents and chats organised</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Stacked Cards: Mission & Vision -->
+            <div class="mission-vision-stack">
+                <div class="mission-card">
+                    <div class="mission-card-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h4>Our mission</h4>
+                    <p>To help everyone get answers from their documents quickly, clearly and with confidence.</p>
+                </div>
+
+                <div class="mission-card">
+                    <div class="mission-card-icon">
+                        <i class="far fa-compass"></i>
+                    </div>
+                    <h4>Our vision</h4>
+                    <p>A world where working with documents feels as easy as having a conversation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: CONTACT (Mockup 4) -->
+    <section class="landing-section" id="contact">
+        <div class="contact-2col-grid">
+            <!-- Left Contact Info -->
+            <div>
+                <div class="section-label">Contact</div>
+                <h2 class="section-heading">Get in touch</h2>
+                <p class="section-subheading" style="margin-bottom: 24px;">Questions or feedback? Send us a message and we'll get back to you.</p>
+
+                <div class="contact-info-pills">
+                    <div class="contact-pill-item">
+                        <i class="far fa-envelope" style="color: var(--text-muted); font-size: 1rem;"></i>
+                        <span>hello@woxionchat.com</span>
+                    </div>
+                    <div class="contact-pill-item">
+                        <i class="fas fa-map-marker-alt" style="color: var(--text-muted); font-size: 1rem;"></i>
+                        <span>Online • Available worldwide</span>
+                    </div>
+                    <a href="https://github.com/woxionchat" target="_blank" class="contact-pill-item" style="color: inherit; text-decoration: none;">
+                        <i class="fab fa-github" style="font-size: 1.1rem;"></i>
+                        <span>github.com/woxionchat</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Contact Form Card -->
+            <div class="contact-form-card">
+                <div id="contactFormAlert" class="woxion-alert" style="display: none;"></div>
+
+                <form id="landingContactForm" onsubmit="handleContactSubmit(event)">
+                    {% csrf_token %}
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label" for="contactName">Name</label>
+                            <input type="text" id="contactName" class="form-control-warm" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="contactEmail">Email</label>
+                            <input type="email" id="contactEmail" class="form-control-warm" placeholder="you@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contactSubject">Subject</label>
+                        <input type="text" id="contactSubject" class="form-control-warm" placeholder="How can we help?" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contactMessage">Message</label>
+                        <textarea id="contactMessage" class="form-control-warm" rows="4" placeholder="Write your message..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-start-chat" style="padding: 10px 22px; font-size: 0.9rem; margin-top: 8px;">
+                        <span>Send message</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: FOOTER (Mockup 4) -->
+    <footer class="landing-footer">
+        <div class="footer-top-row">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <img src="{% static 'images/woxion-icon.png' %}" alt="WoxionChat" class="brand-logo-img" width="32" height="32" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+                    <strong style="font-size: 1.1rem; color: var(--text-main);">WoxionChat</strong>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 280px; line-height: 1.45;">
+                    Chat with your documents and get clear answers.
+                </p>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-links-col">
+                    <a href="#features">Features</a>
+                    <a href="#use-cases">Use cases</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-links-col">
+                    <a href="#how-it-works">How it works</a>
+                    <a href="#about">About</a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <a href="mailto:hello@woxionchat.com" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="far fa-envelope"></i> hello@woxionchat.com
+                </a>
+                <a href="https://github.com/woxionchat" target="_blank" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fab fa-github"></i> github.com/woxionchat
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom-row">
+            © 2025 WoxionChat. All rights reserved.
+        </div>
+    </footer>
 </div>
-{% endblock %}
+
+<script>
+function handleContactSubmit(e) {
+    e.preventDefault();
+    const alertBox = document.getElementById('contactFormAlert');
+    alertBox.style.display = 'flex';
+    alertBox.className = 'woxion-alert success';
+    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Thank you! Your message has been sent. We will get back to you shortly.';
+    document.getElementById('landingContactForm').reset();
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+</script>
+</body>
+</html>

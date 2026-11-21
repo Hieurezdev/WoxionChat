@@ -1,462 +1,578 @@
 {% extends "accounts/base.html" %}
 {% load static %}
 
-{% block title %}Danh sách file - OCR Feature{% endblock %}
+{% block title %}WoxionChat - Documents{% endblock %}
 
 {% block content %}
-<style>
-    .files-header {
-        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-        border-radius: 16px;
-        padding: 40px;
-        text-align: center;
-        color: white;
-        margin-bottom: 32px;
-        position: relative;
-        
-        box-shadow: 
-            0 20px 60px rgba(16, 185, 129, 0.3),
-            0 8px 25px rgba(15, 183, 127, 0.2);
-    }
-    .files-header::before{
-        content: '';
-        position: absolute;
-        top:  0%;     /* Mở rộng ra ngoài container */
-        left: 0%;    /* Mở rộng ra ngoài container */
-        width: 100%;   /* Gấp đôi kích thước để che phủ toàn bộ */
-        height: 100%;  /* Gấp đôi kích thước để che phủ toàn bộ */
-    }
-
-    @keyframes rotate-light {
-        0% { 
-            transform: rotate(0deg);   /* Bắt đầu ở 0 độ */
-        }
-        100% { 
-            transform: rotate(360deg); /* Xoay một vòng tròn hoàn chỉnh */
-        }
-    }
-
-
-    .files-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 16px;
-    }
-
-    .files-subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-    }
-
-    .files-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .search-box {
-        border-radius: 100% !important;
-        position: relative;
-        flex: 1;
-        max-width: 400px;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 12px 16px 12px 48px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-        border-color: #10a37f;
-        box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.1);
-        outline: none;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6b7280;
-        font-size: 18px;
-    }
-
-    .upload-link {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .upload-link:hover {
-        background: linear-gradient(135deg, #0d8f69, #12a374);
-        color: white;
-        text-decoration: none;
-        transform: translateY(-2px);
-    }
-
-    .files-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-
-    .file-card {
-        background: rgb(255, 255, 255);
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .file-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
-    }
-
-    .file-header {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 20px;
-        font-weight: 375;
-    }
-
-    .file-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: white;
-    }
-
-    .file-icon.pdf {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-    }
-
-    .file-icon.docx {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    }
-
-    .file-icon.txt {
-        background: linear-gradient(135deg, #6b7280, #4b5563);
-    }
-
-    .file-icon.image {
-        background: linear-gradient(135deg, #10b981, #059669);
-    }
-
-    .file-icon.default {
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    }
-
-    .file-info h3 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-        color: #1f2937;
-        line-height: 1.4;
-    }
-
-    .file-info p {
-        margin: 4px 0 0;
-        font-size: 14px;
-        color: #6b7280;
-    }
-
-    .file-meta {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 20px;
-        padding: 16px;
-        background: #ffffff;
-        border-radius: 10px;
-        border: #10a37f solid 1px;
-    }
-
-    .meta-item {
-        text-align: center;
-    }
-
-    .meta-label {
-        font-size: 12px;
-        color: #6b7280;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-
-    .meta-value {
-        font-size: 14px;
-        color: #1f2937;
-        font-weight: 600;
-    }
-
-    .file-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: space-between;
-    }
-
-    .action-btn {
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 375;
-        transition: all 0.2s ease;
-        flex: 1;
-        text-align: center;
-        border: 1px solid;
-    }
-
-    .btn-view {
-        background: #10a37f;
-        color: white;
-        border-color: #10a37f;
-    }
-
-    .btn-view:hover {
-        background: #0d8f69;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-ocr {
-        background: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
-
-    .btn-ocr:hover {
-        background: #1d4ed8;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-download {
-        background: #6b7280;
-        color: white;
-        border-color: #6b7280;
-    }
-
-    .btn-download:hover {
-        background: #4b5563;
-        color: white;
-        text-decoration: none;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 80px 40px;
-        color: #6b7280;
-    }
-
-    .empty-icon {
-        font-size: 64px;
-        margin-bottom: 24px;
-        color: #d1d5db;
-    }
-
-    .empty-title {
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 16px;
-        color: #374151;
-    }
-
-    .empty-text {
-        font-size: 16px;
-        margin-bottom: 32px;
-        line-height: 1.6;
-    }
-
-    .file-status {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .status-uploaded {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .status-processing {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .files-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .files-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .search-box {
-            max-width: none;
-        }
-
-        .files-title {
-            font-size: 2rem;
-        }
-
-        .files-header {
-            padding: 32px 24px;
-        }
-    }
-</style>
-
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="files-header">
-        <h1 class="files-title">
-            <i class="fas fa-folder"></i>
-            Danh sách file
-        </h1>
-        <p class="files-subtitle">Quản lý và xử lý các file đã tải lên</p>
+<div class="main-content-scroll">
+    <!-- Page Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-heading">Documents</h1>
+            <p class="page-subheading">Upload files, track processing, and choose which documents WoxionChat should use.</p>
+        </div>
+        <div>
+            <button type="button" class="btn-primary-yellow" onclick="document.getElementById('docsFileInput').click();">
+                <i class="fas fa-plus"></i>
+                <span>Upload</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Actions -->
-    <div class="files-actions">
-        <div class="search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Tìm kiếm file..." id="searchInput">
+    <!-- Drag & Drop Zone Card -->
+    <div class="dropzone-card" id="docsDropzone" onclick="document.getElementById('docsFileInput').click();">
+        <div class="dropzone-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
         </div>
-        <a href="{% url 'OCRfeature:upload_file' %}" class="upload-link">
-            <i class="fas fa-plus"></i>
-            Tải file mới
-        </a>
+        <div class="dropzone-text">
+            Drag and drop files here, or <span class="highlight-browse">browse</span>
+        </div>
+        <div class="dropzone-subtext">
+            PDF, DOCX, TXT, PNG and JPG • Scanned files are read with OCR automatically
+        </div>
+
+        <form id="docsUploadForm" action="{% url 'OCRfeature:upload_file' %}" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <input type="file" id="docsFileInput" name="file" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg">
+        </form>
     </div>
 
-    <!-- Files Grid -->
-    {% if files %}
-        <div class="files-grid" id="filesGrid">
-            {% for file in files %}
-            <div class="file-card" data-title="{{ file.title|lower }}" data-filename="{{ file.filename|lower }}">
-                <!-- <div class="file-status status-uploaded">
-                    Đã tải lên
-                </div> -->
-                
-                <div class="file-header">
-                    <div class="file-icon {% if file.extension == '.pdf' %}pdf{% elif file.extension == '.docx' %}docx{% elif file.extension == '.txt' %}txt{% elif file.extension in '.png,.jpg,.jpeg' %}image{% else %}default{% endif %}">
-                        {% if file.extension == '.pdf' %}
-                            <i class="fas fa-file-pdf"></i>
-                        {% elif file.extension == '.docx' %}
-                            <i class="fas fa-file-word"></i>
-                        {% elif file.extension == '.txt' %}
-                            <i class="fas fa-file-alt"></i>
-                        {% elif file.extension in '.png,.jpg,.jpeg' %}
-                            <i class="fas fa-file-image"></i>
-                        {% else %}
-                            <i class="fas fa-file"></i>
-                        {% endif %}
-                    </div>
-                    <div class="file-info">
-                        <h3>{{ file.title }}</h3>
-                        <p>{{ file.filename }}</p>
-                    </div>
+    <!-- Active Upload Progress Card (hidden by default, toggled via JS) -->
+    <div class="upload-active-card" id="uploadActiveCard" style="display: none;">
+        <div class="upload-active-header">
+            <div class="upload-active-info">
+                <div class="doc-type-icon pdf" style="width: 28px; height: 28px; font-size: 0.9rem;">
+                    <i class="far fa-file-pdf"></i>
                 </div>
-
-                <div class="file-meta">
-                    <div class="meta-item">
-                        <div class="meta-label">Kích thước</div>
-                        <div class="meta-value">{{ file.file_size|filesizeformat }}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Ngày tải</div>
-                        <div class="meta-value">{{ file.uploaded_at|date:"d/m/Y" }}</div>
-                    </div>
-                </div>
-
-                <div class="file-actions">
-                    <a href="{% url 'OCRfeature:file_detail' file.id %}" class="action-btn btn-view">
-                        <i class="fas fa-eye"></i>
-                        Xem
-                    </a>
-                    <!-- <a href="{% url 'OCRfeature:process_ocr' file.id %}" class="action-btn btn-ocr">
-                        <i class="fas fa-brain"></i>
-                        OCR
-                    </a> -->
-                    <a href="{% url 'OCRfeature:download_file' file.id %}" class="action-btn btn-download">
-                        <i class="fas fa-download"></i>
-                        Tải
-                    </a>
-                </div>
+                <span id="uploadActiveFilename">Supplier_Code_of_Conduct.pdf</span>
             </div>
-            {% endfor %}
+            <div class="upload-active-status" id="uploadActiveStatusText">Uploading • 1.8 of 3.2 MB</div>
+            <button type="button" class="btn-remove-tag" onclick="cancelUpload()" style="font-size: 1rem;">&times;</button>
         </div>
-    {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-folder-open"></i>
+        <div class="upload-progress-track">
+            <div class="upload-progress-fill" id="uploadProgressFill" style="width: 55%;"></div>
+        </div>
+    </div>
+
+    <!-- Filter Pills & Toolbar -->
+    <div class="docs-toolbar">
+        <div class="filter-pills">
+            <button type="button" class="filter-pill-btn active" data-filter="all">All <span id="countAll">{{ files|length|default:"12" }}</span></button>
+            <button type="button" class="filter-pill-btn" data-filter="ready">Ready <span id="countReady">9</span></button>
+            <button type="button" class="filter-pill-btn" data-filter="processing">Processing <span id="countProcessing">1</span></button>
+            <button type="button" class="filter-pill-btn" data-filter="uploaded">Uploaded <span id="countUploaded">1</span></button>
+            <button type="button" class="filter-pill-btn" data-filter="failed">Failed <span id="countFailed">1</span></button>
+        </div>
+
+        <div class="docs-toolbar-right">
+            <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="docsTableSearch" placeholder="Search documents..." oninput="filterDocsTable(this.value)">
             </div>
-            <h2 class="empty-title">Chưa có file nào</h2>
-            <p class="empty-text">
-                Bạn chưa tải lên file nào. Hãy bắt đầu bằng cách tải lên file đầu tiên để trải nghiệm tính năng OCR.
-            </p>
-            <a href="{% url 'OCRfeature:upload_file' %}" class="upload-link">
-                <i class="fas fa-cloud-upload-alt"></i>
-                Tải file đầu tiên
-            </a>
+            <select class="sort-select" id="docsSortSelect" onchange="sortDocsTable(this.value)">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="name">Name (A-Z)</option>
+            </select>
         </div>
-    {% endif %}
+    </div>
+
+    <!-- Bulk Selection Dark Bar (Shown when items checked) -->
+    <div class="bulk-select-bar" id="bulkSelectBar" style="display: none;">
+        <div class="bulk-count" id="bulkSelectCountText">2 documents selected</div>
+        <div class="bulk-actions">
+            <button type="button" class="btn-bulk-clear" onclick="clearTableSelection()">Clear</button>
+            <button type="button" class="btn-bulk-chat" onclick="chatWithSelectedDocs()">
+                <i class="fas fa-comment"></i>
+                <span>Chat with selected</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Documents Table Card -->
+    <div class="docs-table-card">
+        <table class="woxion-table" id="docsTable">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" class="table-checkbox" id="selectAllCheckbox" onchange="toggleSelectAllDocs(this)">
+                    </th>
+                    <th>NAME</th>
+                    <th>STATUS</th>
+                    <th>CHUNKING</th>
+                    <th>UPLOADED</th>
+                    <th style="text-align: right;">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if files %}
+                    {% for file in files %}
+                    <tr class="doc-table-row" data-filename="{{ file.title|default:file.filename|lower }}" data-status="ready" data-id="{{ file.id }}">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon {% if file.extension == '.pdf' %}pdf{% elif file.extension == '.docx' %}docx{% elif file.extension in '.png.jpg.jpeg' %}image{% else %}txt{% endif %}" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far {% if file.extension == '.pdf' %}fa-file-pdf{% elif file.extension == '.docx' %}fa-file-word{% elif file.extension in '.png.jpg.jpeg' %}fa-file-image{% else %}fa-file-alt{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">{{ file.title|default:file.filename }}</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">{{ file.file_size_display }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill ready">
+                                <span class="status-dot-green"></span>
+                                <span>Ready</span>
+                            </span>
+                        </td>
+                        <td>96 chunks</td>
+                        <td>{{ file.uploaded_at|date:"M d, Y" }}</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}?file_id={{ file.id }}" class="btn-use-chat">Use in chat</a>
+                                <a href="{% url 'OCRfeature:file_detail' file.id %}" class="btn-table-more" title="Details">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <!-- Mockup Example Items -->
+                    <tr class="doc-table-row selected" data-filename="q3_vendor_agreement.pdf" data-status="ready" data-id="doc-1">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" checked onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon pdf" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Q3_Vendor_Agreement.pdf</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">2.4 MB • 38 pages</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill ready">
+                                <span class="status-dot-green"></span>
+                                <span>Ready</span>
+                            </span>
+                        </td>
+                        <td>142 chunks</td>
+                        <td>Oct 12, 2024</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row selected" data-filename="master_services_agreement.pdf" data-status="ready" data-id="doc-2">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" checked onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon pdf" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Master_Services_Agreement.pdf</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">1.6 MB • 24 pages</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill ready">
+                                <span class="status-dot-green"></span>
+                                <span>Ready</span>
+                            </span>
+                        </td>
+                        <td>88 chunks</td>
+                        <td>Oct 10, 2024</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row" data-filename="board_minutes_sept_scan.png" data-status="processing" data-id="doc-3">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon image" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-image"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Board_Minutes_Sept_scan.png</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">5.1 MB • Scanned image</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill processing">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 0.7rem;"></i>
+                                <span>Processing</span>
+                            </span>
+                        </td>
+                        <td><span style="color: #f97316;">— Running OCR...</span></td>
+                        <td>4 min ago</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row" data-filename="supplier_onboarding_checklist.txt" data-status="uploaded" data-id="doc-4">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon txt" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Supplier_Onboarding_Checklist.txt</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">48 KB • Text</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill uploaded">
+                                <i class="fas fa-arrow-up" style="font-size: 0.65rem;"></i>
+                                <span>Uploaded</span>
+                            </span>
+                        </td>
+                        <td>Waiting to process</td>
+                        <td>Just now</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row" data-filename="insurance_policy_renewal.pdf" data-status="failed" data-id="doc-5">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon pdf" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Insurance_Policy_Renewal.pdf</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem; color: #dc2626;">File is password-protected</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill failed">
+                                <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                <span>Failed</span>
+                            </span>
+                        </td>
+                        <td><span style="color: #dc2626;">Not chunked</span></td>
+                        <td>Oct 9, 2024</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <button type="button" class="btn-use-chat" onclick="document.getElementById('docsFileInput').click();">
+                                    <i class="fas fa-redo-alt" style="font-size: 0.75rem;"></i>
+                                    <span>Re-upload</span>
+                                </button>
+                                <button type="button" class="btn-table-more" style="color: #dc2626;"><i class="far fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row" data-filename="employee_handbook_2024.docx" data-status="ready" data-id="doc-6">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon docx" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-word"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Employee_Handbook_2024.docx</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">1.1 MB • 52 pages</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill ready">
+                                <span class="status-dot-green"></span>
+                                <span>Ready</span>
+                            </span>
+                        </td>
+                        <td>96 chunks</td>
+                        <td>Oct 3, 2024</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="doc-table-row" data-filename="data_retention_policy.pdf" data-status="ready" data-id="doc-7">
+                        <td>
+                            <input type="checkbox" class="table-checkbox row-select-checkbox" onchange="handleRowSelectChange()">
+                        </td>
+                        <td>
+                            <div class="table-file-cell">
+                                <div class="doc-type-icon pdf" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div>
+                                    <div class="doc-title" style="font-size: 0.88rem;">Data_Retention_Policy.pdf</div>
+                                    <div class="doc-subtext" style="font-size: 0.76rem;">640 KB • 12 pages</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-pill ready">
+                                <span class="status-dot-green"></span>
+                                <span>Ready</span>
+                            </span>
+                        </td>
+                        <td>31 chunks</td>
+                        <td>Sep 28, 2024</td>
+                        <td style="text-align: right;">
+                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                <a href="{% url 'chat_advanced' %}" class="btn-use-chat">Use in chat</a>
+                                <button type="button" class="btn-table-more"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Table Footer Pagination -->
+        <div class="table-pagination-footer">
+            <span>Showing 7 of 12</span>
+            <div class="pagination-controls">
+                <button type="button" class="btn-page-nav" title="Previous page"><i class="fas fa-chevron-left"></i></button>
+                <button type="button" class="btn-page-nav" title="Next page"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Legend 4 Cards Grid (Mockup Bottom) -->
+    <div class="status-legend-grid">
+        <div class="status-legend-card">
+            <div class="legend-badge">
+                <i class="fas fa-arrow-up" style="color: #64748b;"></i>
+                <span style="color: #475569;">Uploaded</span>
+            </div>
+            <div class="legend-desc">File received and queued for processing.</div>
+        </div>
+
+        <div class="status-legend-card">
+            <div class="legend-badge">
+                <i class="fas fa-spinner fa-spin" style="color: #f97316;"></i>
+                <span style="color: #d97706;">Processing</span>
+            </div>
+            <div class="legend-desc">Text extraction, OCR and chunking in progress.</div>
+        </div>
+
+        <div class="status-legend-card">
+            <div class="legend-badge">
+                <span class="status-dot-green"></span>
+                <span style="color: #16a34a;">Ready</span>
+            </div>
+            <div class="legend-desc">Indexed and available as chat context.</div>
+        </div>
+
+        <div class="status-legend-card">
+            <div class="legend-badge">
+                <i class="fas fa-circle" style="color: #ef4444; font-size: 0.6rem;"></i>
+                <span style="color: #dc2626;">Failed</span>
+            </div>
+            <div class="legend-desc">Couldn't be processed. See the reason and re-upload.</div>
+        </div>
+    </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const filesGrid = document.getElementById('filesGrid');
-    
-    if (searchInput && filesGrid) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const fileCards = filesGrid.querySelectorAll('.file-card');
-            
-            fileCards.forEach(card => {
-                const title = card.dataset.title || '';
-                const filename = card.dataset.filename || '';
-                
-                if (title.includes(searchTerm) || filename.includes(searchTerm)) {
-                    card.style.display = 'block';
+    // Check initial row selection to update bulk bar
+    handleRowSelectChange();
+
+    // Setup drag and drop for dropzone
+    const dropzone = document.getElementById('docsDropzone');
+    const fileInput = document.getElementById('docsFileInput');
+    const form = document.getElementById('docsUploadForm');
+
+    if (dropzone && fileInput) {
+        ['dragenter', 'dragover'].forEach(name => {
+            dropzone.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(name => {
+            dropzone.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('drag-over');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                fileInput.files = files;
+                showUploadProgress(files[0].name);
+            }
+        });
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                showUploadProgress(this.files[0].name);
+            }
+        });
+    }
+
+    // Filter Pills
+    const filterBtns = document.querySelectorAll('.filter-pill-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const filter = this.dataset.filter;
+            const rows = document.querySelectorAll('.doc-table-row');
+            rows.forEach(r => {
+                if (filter === 'all' || r.dataset.status === filter) {
+                    r.style.display = '';
                 } else {
-                    card.style.display = 'none';
+                    r.style.display = 'none';
                 }
             });
         });
-    }
+    });
 });
-</script>
 
-{% endblock %} 
+function handleRowSelectChange() {
+    const checkedRows = document.querySelectorAll('.row-select-checkbox:checked');
+    const bulkBar = document.getElementById('bulkSelectBar');
+    const bulkCountText = document.getElementById('bulkSelectCountText');
+    const allCheckbox = document.getElementById('selectAllCheckbox');
+
+    const allRowBoxes = document.querySelectorAll('.row-select-checkbox');
+    allRowBoxes.forEach(box => {
+        const tr = box.closest('tr');
+        if (box.checked) {
+            tr.classList.add('selected');
+        } else {
+            tr.classList.remove('selected');
+        }
+    });
+
+    if (checkedRows.length > 0) {
+        bulkBar.style.display = 'flex';
+        bulkCountText.textContent = `${checkedRows.length} document${checkedRows.length > 1 ? 's' : ''} selected`;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+
+    if (allCheckbox) {
+        allCheckbox.checked = (checkedRows.length === allRowBoxes.length && allRowBoxes.length > 0);
+    }
+}
+
+function toggleSelectAllDocs(master) {
+    const boxes = document.querySelectorAll('.row-select-checkbox');
+    boxes.forEach(b => {
+        b.checked = master.checked;
+    });
+    handleRowSelectChange();
+}
+
+function clearTableSelection() {
+    const boxes = document.querySelectorAll('.row-select-checkbox');
+    boxes.forEach(b => b.checked = false);
+    const master = document.getElementById('selectAllCheckbox');
+    if (master) master.checked = false;
+    handleRowSelectChange();
+}
+
+function chatWithSelectedDocs() {
+    window.location.href = "{% url 'chat_advanced' %}";
+}
+
+function filterDocsTable(query) {
+    const q = query.toLowerCase();
+    const rows = document.querySelectorAll('.doc-table-row');
+    rows.forEach(r => {
+        if (r.dataset.filename.includes(q)) {
+            r.style.display = '';
+        } else {
+            r.style.display = 'none';
+        }
+    });
+}
+
+function sortDocsTable(criteria) {
+    const tbody = document.querySelector('#docsTable tbody');
+    const rows = Array.from(tbody.querySelectorAll('.doc-table-row'));
+
+    if (criteria === 'name') {
+        rows.sort((a, b) => a.dataset.filename.localeCompare(b.dataset.filename));
+    } else if (criteria === 'oldest') {
+        rows.reverse();
+    }
+    rows.forEach(r => tbody.appendChild(r));
+}
+
+function showUploadProgress(filename) {
+    const card = document.getElementById('uploadActiveCard');
+    const nameEl = document.getElementById('uploadActiveFilename');
+    const fill = document.getElementById('uploadProgressFill');
+    const statusText = document.getElementById('uploadActiveStatusText');
+
+    if (card && nameEl && fill) {
+        nameEl.textContent = filename;
+        card.style.display = 'flex';
+        let progress = 10;
+        fill.style.width = '10%';
+        const interval = setInterval(() => {
+            progress += 15;
+            fill.style.width = progress + '%';
+            statusText.textContent = `Uploading • ${Math.round(progress * 0.032 * 10) / 10} of 3.2 MB`;
+            if (progress >= 100) {
+                clearInterval(interval);
+                document.getElementById('docsUploadForm').submit();
+            }
+        }, 200);
+    }
+}
+
+function cancelUpload() {
+    const card = document.getElementById('uploadActiveCard');
+    if (card) card.style.display = 'none';
+}
+</script>
+{% endblock %}

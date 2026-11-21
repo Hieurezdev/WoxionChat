@@ -1,0 +1,429 @@
+
+/* =========================================
+   WOXIONCHAT - NEW DESIGN SYSTEM
+   Warm Ivory / Soft Yellow
+========================================= */
+
+:root {
+    --wx-bg: #fffdf7;
+    --wx-sidebar: #fff7df;
+    --wx-yellow: #ffd34e;
+    --wx-yellow-light: #fff0bd;
+    --wx-text: #29251f;
+    --wx-muted: #8b8375;
+    --wx-border: #eee5d1;
+    --wx-white: #ffffff;
+    --wx-green: #18a779;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--wx-bg) !important;
+    color: var(--wx-text);
+    font-family: Inter, "Segoe UI", sans-serif;
+}
+
+body {
+    background-image: none !important;
+}
+
+/* APP LAYOUT */
+
+.wx-layout {
+    min-height: 100vh;
+    background: var(--wx-bg);
+}
+
+.wx-sidebar {
+    width: 224px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1100;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px 13px;
+    background: var(--wx-sidebar);
+    border-right: 1px solid var(--wx-border);
+
+    transition: transform .25s ease;
+}
+
+/* BRAND */
+
+.wx-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 0 7px 25px;
+
+    color: var(--wx-text);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.wx-brand:hover {
+    color: var(--wx-text);
+}
+
+.wx-logo {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+
+    background: var(--wx-yellow);
+    border-radius: 8px;
+
+    color: #49380b;
+    font-weight: 800;
+}
+
+/* NEW CHAT */
+
+.wx-new-chat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 11px;
+    margin-bottom: 27px;
+
+    background: var(--wx-yellow);
+    color: #342a12;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+
+    border-radius: 9px;
+    box-shadow: 0 2px 0 #edc447;
+
+    transition: .2s;
+}
+
+.wx-new-chat:hover {
+    background: #ffca32;
+    color: #342a12;
+    transform: translateY(-1px);
+}
+
+/* NAVIGATION */
+
+.wx-label {
+    padding: 0 10px 9px;
+    color: #a49a83;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.wx-account-label {
+    margin-top: 25px;
+}
+
+.wx-nav {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    padding: 10px 11px;
+    margin: 2px 0;
+
+    color: #625c50;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 550;
+
+    border-radius: 8px;
+    transition: .18s;
+}
+
+.wx-nav i {
+    width: 16px;
+    text-align: center;
+    color: #837b6d;
+}
+
+.wx-nav:hover {
+    background: #fff0bd;
+    color: #352b12;
+}
+
+.wx-nav.active {
+    background: #ffe9a5;
+    color: #352b12;
+    font-weight: 700;
+}
+
+/* USER */
+
+.wx-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 13px;
+    border-top: 1px solid #eee2c2;
+}
+
+.wx-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.wx-avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    background: #eadbbd;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.wx-user-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.wx-user-info strong {
+    font-size: 11px;
+}
+
+.wx-user-info small {
+    font-size: 9px;
+    color: var(--wx-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wx-user > a {
+    color: var(--wx-muted);
+    padding: 5px;
+}
+
+/* MAIN */
+
+.wx-main {
+    margin-left: 224px;
+    min-height: 100vh;
+    min-width: 0;
+}
+
+.wx-header {
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 0 27px;
+
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid var(--wx-border);
+}
+
+.wx-header-title {
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.wx-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--wx-muted);
+    font-size: 10px;
+}
+
+.wx-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #28b779;
+}
+
+.wx-header-divider {
+    height: 17px;
+    border-left: 1px solid var(--wx-border);
+    margin: 0 7px;
+}
+
+.wx-menu-button {
+    display: none;
+    border: 0;
+    background: transparent;
+    font-size: 17px;
+}
+
+/* CONTENT */
+
+main.container {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100vh - 54px);
+
+    margin: 0;
+    padding: 28px 32px 45px;
+
+    background: transparent;
+}
+
+/* CARDS */
+
+.card,
+.action-card,
+.info-section,
+.quick-actions {
+    background: var(--wx-white);
+    border: 1px solid var(--wx-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 3px 14px rgba(75,57,15,.045);
+}
+
+.card:hover,
+.action-card:hover {
+    box-shadow: 0 7px 20px rgba(75,57,15,.07);
+}
+
+/* BUTTONS */
+
+.btn-primary {
+    background: #29251f !important;
+    border-color: #29251f !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.btn-primary:hover {
+    background: #4b4030 !important;
+}
+
+.btn-warning {
+    background: var(--wx-yellow) !important;
+    border-color: var(--wx-yellow) !important;
+    color: #342a12 !important;
+}
+
+button, a {
+    transition: .18s ease;
+}
+
+/* FORMS */
+
+.form-control,
+.form-select,
+input,
+textarea {
+    border: 1px solid #e8dfce !important;
+    border-radius: 8px !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+textarea:focus {
+    border-color: #e7bd43 !important;
+    box-shadow: 0 0 0 3px #ffefbd !important;
+}
+
+/* PUBLIC PAGES */
+
+.wx-public {
+    min-height: 100vh;
+}
+
+.wx-public-header {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6%;
+    background: white;
+    border-bottom: 1px solid var(--wx-border);
+}
+
+.wx-login,
+.wx-register {
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.wx-login {
+    color: var(--wx-text);
+}
+
+.wx-register {
+    color: #342a12;
+    background: var(--wx-yellow);
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 850px) {
+    .wx-sidebar {
+        width: 205px;
+    }
+
+    .wx-main {
+        margin-left: 205px;
+    }
+
+    main.container {
+        padding: 22px 18px;
+    }
+}
+
+@media(max-width: 650px) {
+    .wx-sidebar {
+        width: 235px;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px rgba(0,0,0,.1);
+    }
+
+    .wx-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .wx-main {
+        margin-left: 0;
+    }
+
+    .wx-menu-button {
+        display: block;
+    }
+
+    .wx-header {
+        padding: 0 15px;
+    }
+
+    .wx-header-right {
+        display: none;
+    }
+
+    main.container {
+        padding: 17px 12px;
+    }
+}

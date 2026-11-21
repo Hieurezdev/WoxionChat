@@ -1,0 +1,23 @@
+# IDE & Editors
+.idea/
+.vscode/
+
+# Archive & temporary files
+*.zip
+SourceCode/WoxionChat/original design/
+SourceCode/WoxionChat/zip/
+SourceCode/WoxionChat/zip1/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
