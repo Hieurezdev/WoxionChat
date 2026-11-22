@@ -5,6 +5,7 @@ from agenticRAG import routes
 urlpatterns = [
     # Main pages
     path('', views.home_view, name='home'),
+    path('landing/', views.home_view, name='landing'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -22,6 +23,7 @@ urlpatterns = [
     # Demo Chat Interface - Simple demo chatbot
     path('demo-chat/', views.demo_chat_view, name='demo_chat'),
     path('chat/advanced/', views.chat_advanced_view, name='chat_advanced'),  # Advanced chat demo
+    path('chat/history/', views.chat_history_view, name='chat_history'),
     path('chat/test/', views.test_user_database_view, name='test_chat'),  # Test endpoint without auth
     path('chat/', routes.chat, name='normal_chat'),
     

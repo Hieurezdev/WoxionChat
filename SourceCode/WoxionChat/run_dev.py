@@ -24,9 +24,13 @@ def main():
     print("\033[1;36m=== Khởi chạy môi trường Phát triển WoxionChat + ACE ===\033[0m")
     
     # Check virtual environment python
-    venv_python = os.path.join(".venv", "bin", "python")
+    if os.name == 'nt':
+        venv_python = os.path.join(".venv", "Scripts", "python.exe")
+    else:
+        venv_python = os.path.join(".venv", "bin", "python")
+        
     if not os.path.exists(venv_python):
-        venv_python = "python" # fallback to global python
+        venv_python = sys.executable or "python"
         
     print(f"Sử dụng Python: {venv_python}")
     

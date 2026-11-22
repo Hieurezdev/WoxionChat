@@ -1,645 +1,373 @@
 {% extends 'accounts/base.html' %}
+{% load static %}
 
-{% block title %}Dashboard - WoxionChat{% endblock %}
+{% block title %}WoxionChat - Dashboard{% endblock %}
 
 {% block content %}
-<style>
-    body {
-            /* background: linear-gradient(-45deg, #c9fac0, #91e8ae, #78d3b9, #d5eef4) !important; */
-            min-height: 100vh;
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', sans-serif;
-            color: #1f2937;
-            
-        }
-    
-    .dashboard-header {
-        background: rgb(255, 255, 255);
-        padding: 32px 40px;
-        margin-bottom: 32px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border: 1px solid #f1f5f9;
-        border-top: 4px solid #10a37f;
-        animation: fadeInScaleUp 0.6s ease-out;
-        transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
-        border-radius: 10px;
-    }
-    
-    .dashboard-header:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-    }
-    
-    @keyframes fadeInScaleUp {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-    
-    .welcome-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: rgb(30,123,94);
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
-    }
-    
-    .welcome-subtitle {
-        color: #6b7280;
-        font-size: 1.1rem;
-        margin-bottom: 24px;
-        font-weight: 375;
-    }
-    
-    .user-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        border-radius: 20px;
-        color: white;
-        padding: 8px 16px;
-        font-weight: 375;
-        font: 'Inter';
-        font-size: 0.9rem;
-        border-top: 4px solid #10a37f;
-    }
-    
-    .action-card {
-        background: white;
-        padding: 32px 24px;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        border: 1px solid #f1f5f9;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-        animation: fadeInScaleUp 0.6s ease-out;
-        border-radius: 10px;
-        border-top: 4px solid #10a37f;
-        font-weight: 375;
-    }
+<div class="main-content-scroll">
+    <!-- Top Greeting Header -->
+    <div class="dashboard-page-header">
+        <div>
+            <div class="dashboard-date" id="liveDate">Tuesday, 14 October</div>
+            <h1 class="dashboard-greeting" id="greetingText">Good morning, {{ user.first_name|default:user.username }}</h1>
+            <p class="dashboard-subtitle">Pick up where you left off, or ask a new question about your documents.</p>
+        </div>
+        <div>
+            <div class="workspace-badge">
+                <span class="status-dot-green"></span>
+                <span>Northwind Capital workspace</span>
+            </div>
+        </div>
+    </div>
 
-    @keyframes fadeInScaleUp {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-    
-    .action-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.5s;
-    }
-    
-    .action-card:hover::before {
-        left: 100%;
-    }
-    
-    .action-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    }
-    
-    .action-icon {
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 2rem;
-        color: white;
-        background: linear-gradient(135deg, #10a37f, #15b887);
-    }
-    
-    .action-icon.profile { background: linear-gradient(135deg, #059669, #047857); }
-    .action-icon.admin { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-    .action-icon.info { background: linear-gradient(135deg, #16a34a, #15803d); }
-    .action-icon.chat { background: linear-gradient(135deg, #22c55e, #16a34a); }
-    
-    .action-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: rgb(30,123,94);
-        margin-bottom: 12px;
-    }
-    
-    .action-description {
-        color: #6b7280;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 20px;
-    }
-    
-    .action-btn {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        border-radius: 20px;
-        color: white;
-        padding: 12px 24px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 163, 127, 0.3);
-        color: white;
-    }
-    
-    .action-btn.btn-green {
-        background: linear-gradient(135deg, #059669, #047857);
-    }
-    
-    .action-btn.btn-green:hover {
-        box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
-    }
-    
-    .action-btn.btn-red {
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-    }
-    
-    .action-btn.btn-red:hover {
-        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
-    }
-    
-    .action-btn.btn-emerald {
-        background: linear-gradient(135deg, #16a34a, #15803d);
-    }
-    
-    .action-btn.btn-emerald:hover {
-        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
-    }
-    
-    .info-section {
-        background: white;
-        padding: 32px;
-        margin-top: 32px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        animation: slideInUp 0.8s ease-out 0.4s both;
-        border: 1px solid #f1f5f9;
-        border-radius: 10px;
-        border-top: 4px solid #10a37f;
+    <!-- Hero Cards (Top Row) -->
+    <div class="dashboard-hero-grid">
+        <!-- Left: Ask WoxionChat -->
+        <div class="card-ask-hero">
+            <div class="ask-hero-header">
+                <img src="{% static 'images/woxion-icon.png' %}" alt="WoxionChat" width="32" height="32" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                <div>
+                    <h3 class="ask-hero-title">Ask WoxionChat</h3>
+                    <p class="ask-hero-desc">Answers are grounded in your documents, with citations.</p>
+                </div>
+            </div>
 
-    }
-    
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #f1f5f9;
-    }
-    
-    .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .info-label {
-        font-weight: 500;
-        color: #374151;
-    }
-    
-    .info-value {
-        color: #6b7280;
-        font-weight: 375;
-        font: 'Inter';
-    }
-    
-    .role-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    
-    .role-badge.admin {
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-        color: white;
-    }
-    
-    .role-badge.user {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        color: white;
-    }
-    
-    .user-card {
-        background: linear-gradient(135deg, #1f2937, #374151);
-        color: white;
-        padding: 32px;
-        margin-bottom: 32px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .user-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-        animation: shimmer 3s infinite;
-    }
-    
-    .connection-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 32px;
-    }
-    
-    .stat-card {
-        background: white;
-        padding: 24px;
-        text-align: center;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease;
-        animation: slideInUp 0.8s ease-out both;
-        border: 1px solid #f1f5f9;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #10a37f;
-        margin-bottom: 8px;
-    }
-    
-    .stat-label {
-        color: #6b7280;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    
-    .quick-actions {
-        background: white;
-        padding: 32px;
-        margin-top: 32px;
-        animation: slideInUp 0.8s ease-out 0.8s both;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border: 1px solid #f1f5f9;
-        border-radius: 10px;
-        border-top: 4px solid #10a37f;
-    }
-    
-    .quick-actions h3 {
-        color: rgb(30,123,94);
-        font-weight: 600;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .quick-btn {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        color: #374151;
-        padding: 16px 24px;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transition: all 0.3s ease;
-        margin-bottom: 12px;
-        font-weight: 500;
-    }
-    
-    .quick-btn:hover {
-        background: linear-gradient(135deg, #10a37f, #15b887);
-        color: white;
-        transform: translateX(8px);
-        border-color: #10a37f;
-    }
-    
-    .quick-btn i {
-        width: 20px;
-        text-align: center;
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .dashboard-header {
-            padding: 24px 20px;
-        }
-        
-        .welcome-title {
-            font-size: 2rem;
-        }
-        
-        .action-card {
-            padding: 24px 20px;
-        }
-        
-        .info-section,
-        .quick-actions {
-            padding: 24px 20px;
-        }
-    }
-    
-    /* Animation delays */
-    .action-card:nth-child(1) { animation-delay: 0.2s; }
-    .action-card:nth-child(2) { animation-delay: 0.3s; }
-    .action-card:nth-child(3) { animation-delay: 0.4s; }
-    .action-card:nth-child(4) { animation-delay: 0.5s; }
-    
-    .stat-card:nth-child(1) { animation-delay: 0.6s; }
-    .stat-card:nth-child(2) { animation-delay: 0.7s; }
-    .stat-card:nth-child(3) { animation-delay: 0.8s; }
-    .stat-card:nth-child(4) { animation-delay: 0.9s; }
-</style>
+            <form action="{% url 'chat_advanced' %}" method="get" class="ask-hero-input-form">
+                <div class="ask-hero-input-wrapper">
+                    <input type="text" name="q" class="ask-hero-input" placeholder="Ask anything about your documents..." required autocomplete="off">
+                    <button type="submit" class="btn-start-chat">
+                        <span>Start chat</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
 
-<div class="container">
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="welcome-title">
-                    <i class="fas fa-tachometer-alt me-3"></i>Dashboard
-                </h1>
-                <p class="welcome-subtitle">
-                    Xin chào <strong>{{ user.first_name }} {{ user.last_name }}</strong>, chào mừng bạn quay trở lại!
-                </p>
-                <div class="user-badge">
-                    {% if user.is_admin %}
-                        <i class="fas fa-crown"></i>
+            <div class="ask-hero-chips">
+                <a href="{% url 'chat_advanced' %}?prompt=Summarize+my+document" class="prompt-chip">Summarize my document</a>
+                <a href="{% url 'chat_advanced' %}?prompt=Explain+the+key+concepts" class="prompt-chip">Explain the key concepts</a>
+                <a href="{% url 'chat_advanced' %}?prompt=Compare+two+documents" class="prompt-chip">Compare two documents</a>
+            </div>
+        </div>
+
+        <!-- Right: Upload Documents Dropzone -->
+        <div class="card-upload-hero" id="dashboardDropzone" onclick="document.getElementById('dashFileInput').click();">
+            <div class="upload-hero-icon-circle">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h4 class="upload-hero-title">Upload documents</h4>
+            <p class="upload-hero-subtitle">Drag files here or browse. PDF, DOCX, TXT and scanned images are supported.</p>
+            <button type="button" class="btn-browse-files">Browse files</button>
+
+            <!-- Hidden upload form for direct file selection -->
+            <form id="dashUploadForm" action="{% url 'OCRfeature:upload_file' %}" method="post" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="dashFileInput" name="file" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg">
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content Two-Column Grid -->
+    <div class="dashboard-main-grid">
+        <!-- Left Column: Your Documents & Recent Conversations -->
+        <div class="dashboard-col">
+            <!-- Your Documents Card -->
+            <div class="woxion-card">
+                <div class="card-header-row">
+                    <h3 class="card-title">Your documents</h3>
+                    <a href="{% url 'OCRfeature:list_files' %}" class="card-header-link">View all</a>
+                </div>
+                <div class="card-meta-summary">
+                    {% if total_docs %}
+                        {{ total_docs }} documents • {{ ready_docs }} ready • {{ processing_docs }} processing • {{ uploaded_docs }} uploaded • {{ failed_docs }} failed
                     {% else %}
-                        <i class="fas fa-user"></i>
+                        12 documents • 9 ready • 1 processing • 1 uploaded • 1 failed
                     {% endif %}
-                    {{ user.get_role_display }}
+                </div>
+
+                <div class="doc-items-list">
+                    {% if user_files %}
+                        {% for file in user_files %}
+                        <div class="doc-row-item">
+                            <div class="doc-type-icon {% if file.extension == '.pdf' %}pdf{% elif file.extension == '.docx' %}docx{% elif file.extension in '.png.jpg.jpeg' %}image{% else %}txt{% endif %}">
+                                <i class="far {% if file.extension == '.pdf' %}fa-file-pdf{% elif file.extension == '.docx' %}fa-file-word{% elif file.extension in '.png.jpg.jpeg' %}fa-file-image{% else %}fa-file-alt{% endif %}"></i>
+                            </div>
+                            <div class="doc-info">
+                                <div class="doc-title">{{ file.title|default:file.filename }}</div>
+                                <div class="doc-subtext">{{ file.file_size_display }} • {{ file.uploaded_at|timesince }} ago</div>
+                            </div>
+                            <div>
+                                <span class="status-pill ready">
+                                    <span class="status-dot-green"></span>
+                                    <span>Ready</span>
+                                </span>
+                            </div>
+                            <a href="{% url 'chat_advanced' %}?file_id={{ file.id }}" class="btn-doc-action">Chat</a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Mockup Items -->
+                        <div class="doc-row-item">
+                            <div class="doc-type-icon pdf">
+                                <i class="far fa-file-pdf"></i>
+                            </div>
+                            <div class="doc-info">
+                                <div class="doc-title">Q3_Vendor_Agreement.pdf</div>
+                                <div class="doc-subtext">2.4 MB • 142 chunks • 2 days ago</div>
+                            </div>
+                            <div>
+                                <span class="status-pill ready">
+                                    <span class="status-dot-green"></span>
+                                    <span>Ready</span>
+                                </span>
+                            </div>
+                            <a href="{% url 'chat_advanced' %}" class="btn-doc-action">Chat</a>
+                        </div>
+
+                        <div class="doc-row-item">
+                            <div class="doc-type-icon image">
+                                <i class="far fa-file-image"></i>
+                            </div>
+                            <div class="doc-info">
+                                <div class="doc-title">Board_Minutes_Sept_scan.png</div>
+                                <div class="doc-subtext">5.1 MB • OCR in progress • 4 min ago</div>
+                            </div>
+                            <div>
+                                <span class="status-pill processing">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 0.7rem;"></i>
+                                    <span>Processing</span>
+                                </span>
+                            </div>
+                            <a href="{% url 'chat_advanced' %}" class="btn-doc-action">Chat</a>
+                        </div>
+
+                        <div class="doc-row-item">
+                            <div class="doc-type-icon docx">
+                                <i class="far fa-file-word"></i>
+                            </div>
+                            <div class="doc-info">
+                                <div class="doc-title">Employee_Handbook_2024.docx</div>
+                                <div class="doc-subtext">1.1 MB • 96 chunks • Last week</div>
+                            </div>
+                            <div>
+                                <span class="status-pill ready">
+                                    <span class="status-dot-green"></span>
+                                    <span>Ready</span>
+                                </span>
+                            </div>
+                            <a href="{% url 'chat_advanced' %}" class="btn-doc-action">Chat</a>
+                        </div>
+
+                        <div class="doc-row-item">
+                            <div class="doc-type-icon pdf">
+                                <i class="far fa-file-pdf"></i>
+                            </div>
+                            <div class="doc-info">
+                                <div class="doc-title">Insurance_Policy_Renewal.pdf</div>
+                                <div class="doc-subtext" style="color: #dc2626;">Processing failed • File is password-protected</div>
+                            </div>
+                            <div>
+                                <span class="status-pill failed">
+                                    <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                    <span>Failed</span>
+                                </span>
+                            </div>
+                            <a href="{% url 'OCRfeature:list_files' %}" class="btn-doc-action">Details</a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-            <div class="col-md-4 text-end">
-                <div class="d-flex flex-column align-items-end">
-                    <small class="text-muted">Trạng thái hệ thống</small>
-                    <span class="connection-status">
-                        <i class="fas fa-check-circle" style="color: #10a37f;"></i>
-                        Online
-                    </span>
+
+            <!-- Recent Conversations Card -->
+            <div class="woxion-card">
+                <div class="card-header-row">
+                    <h3 class="card-title">Recent conversations</h3>
+                    <a href="{% url 'chat_history' %}" class="card-header-link">See history</a>
+                </div>
+
+                <div class="conversation-items-list" id="dashboardRecentConvos">
+                    <a href="{% url 'chat_advanced' %}" class="conversation-item">
+                        <i class="far fa-comment convo-icon"></i>
+                        <div class="convo-body">
+                            <div class="convo-title-row">
+                                <div class="convo-title">Vendor agreement termination clauses</div>
+                                <div class="convo-time">10:42</div>
+                            </div>
+                            <div class="convo-snippet">Either party may terminate with 90 days' written notice, except where...</div>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'chat_advanced' %}" class="conversation-item">
+                        <i class="far fa-comment convo-icon"></i>
+                        <div class="convo-body">
+                            <div class="convo-title-row">
+                                <div class="convo-title">Handbook PTO policy summary</div>
+                                <div class="convo-time">Yesterday</div>
+                            </div>
+                            <div class="convo-snippet">Full-time employees accrue 1.67 days of paid time off per month...</div>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'chat_advanced' %}" class="conversation-item">
+                        <i class="far fa-comment convo-icon"></i>
+                        <div class="convo-body">
+                            <div class="convo-title-row">
+                                <div class="convo-title">Compare retention policies</div>
+                                <div class="convo-time">Mon</div>
+                            </div>
+                            <div class="convo-snippet">The 2023 policy retains financial records for 7 years, while the draft...</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: User Card, Document Processing Stats, Tip -->
+        <div class="dashboard-col">
+            <!-- User Profile Card -->
+            <div class="woxion-card user-info-card">
+                <div class="user-card-header">
+                    <div class="user-avatar" style="width: 46px; height: 46px; font-size: 1.1rem;">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <div class="user-card-names">
+                        <h4>{{ user.get_full_name|default:user.username }}</h4>
+                        <p>{{ user.email|default:user.username }}</p>
+                    </div>
+                </div>
+
+                <div class="user-card-details">
+                    <div class="user-detail-row">
+                        <span class="detail-label">Username</span>
+                        <span class="detail-val">{{ user.username }}</span>
+                    </div>
+                    <div class="user-detail-row">
+                        <span class="detail-label">Member since</span>
+                        <span class="detail-val">{{ user.date_joined|date:"M Y"|default:"Mar 2024" }}</span>
+                    </div>
+                    <div class="user-detail-row">
+                        <span class="detail-label">Last sign-in</span>
+                        <span class="detail-val">{{ user.last_login|date:"Today, H:i"|default:"Today, 09:12" }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'profile' %}" class="btn-card-outline">Account settings</a>
+            </div>
+
+            <!-- Document Processing Progress Card -->
+            <div class="woxion-card">
+                <h4 class="card-title" style="font-size: 1rem; margin-bottom: 2px;">Document processing</h4>
+                <div class="card-meta-summary" style="margin-bottom: 12px;">Based on your uploaded files</div>
+
+                <!-- Segmented Bar -->
+                <div class="progress-segmented-bar">
+                    <div class="segment-ready" style="flex: 9;"></div>
+                    <div class="segment-processing" style="flex: 1;"></div>
+                    <div class="segment-uploaded" style="flex: 1;"></div>
+                    <div class="segment-failed" style="flex: 1;"></div>
+                </div>
+
+                <!-- Legend Grid -->
+                <div class="progress-legend-grid">
+                    <div class="legend-item">
+                        <span class="status-dot-green"></span>
+                        <span>Ready</span>
+                        <span class="legend-count">{{ ready_docs|default:"9" }}</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #f97316;"></span>
+                        <span>Processing</span>
+                        <span class="legend-count">{{ processing_docs|default:"1" }}</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #f5c842;"></span>
+                        <span>Uploaded</span>
+                        <span class="legend-count">{{ uploaded_docs|default:"1" }}</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #ef4444;"></span>
+                        <span>Failed</span>
+                        <span class="legend-count">{{ failed_docs|default:"1" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tip Card -->
+            <div class="tip-card">
+                <i class="far fa-lightbulb tip-icon"></i>
+                <div>
+                    <strong>Tip:</strong> Select one or more ready documents before asking — answers will cite the exact pages they came from.
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Main Actions Grid -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon profile">
-                    <i class="fas fa-user-edit"></i>
-                </div>
-                <h4 class="action-title">Hồ sơ cá nhân</h4>
-                <p class="action-description">
-                    Quản lý và cập nhật thông tin tài khoản của bạn
-                </p>
-                <a href="{% url 'profile' %}" class="action-btn btn-green">
-                    <i class="fas fa-edit"></i>
-                    Chỉnh sửa
-                </a>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon chat">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <h4 class="action-title">AI Chat</h4>
-                <p class="action-description">
-                    Trò chuyện với AI thông minh, hỗ trợ OCR và nhiều tính năng nâng cao
-                </p>
-                <a href="{% url 'chat_advanced' %}" class="action-btn">
-                    <i class="fas fa-magic"></i>
-                    Bắt đầu Chat
-                </a>
-            </div>
-        </div>
-        
-        {% if user.is_admin %}
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon admin">
-                    <i class="fas fa-users-cog"></i>
-                </div>
-                <h4 class="action-title">Quản lý Users</h4>
-                <p class="action-description">
-                    Xem và quản lý tất cả người dùng trong hệ thống
-                </p>
-                <a href="{% url 'users_management' %}" class="action-btn btn-red">
-                    <i class="fas fa-cogs"></i>
-                    Quản lý
-                </a>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon admin">
-                    <i class="fas fa-crown"></i>
-                </div>
-                <h4 class="action-title">Admin Dashboard</h4>
-                <p class="action-description">
-                    Truy cập bảng điều khiển quản trị viên
-                </p>
-                <a href="{% url 'admin_dashboard' %}" class="action-btn btn-red">
-                    <i class="fas fa-shield-alt"></i>
-                    Admin Panel
-                </a>
-            </div>
-        </div>
-        {% else %}
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon info">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <h4 class="action-title">Hệ thống Bot</h4>
-                <p class="action-description">
-                    Thông tin về platform WoxionChat
-                </p>
-                <div class="action-btn btn-emerald" style="opacity: 0.7; cursor: not-allowed;">
-                    <i class="fas fa-clock"></i>
-                    Sắp ra mắt
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="action-card">
-                <div class="action-icon info">
-                    <i class="fas fa-file-alt"></i>
-                </div>
-                <h4 class="action-title">Feedback</h4>
-                <p class="action-description">
-                    Gửi ý kiến phản hồi về hệ thống
-                </p>
-                <a href="{% url 'feedback' %}" class="action-btn btn-emerald">
-                    <i class="fas fa-comment-alt"></i>
-                    Gửi feedback
-                </a>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <!-- User Information Section -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="info-section">
-                <h3 style="color: rgb(30,123,94); font-weight: 600; margin-bottom: 24px;">
-                    <i class="fas fa-user me-2"></i>Thông tin tài khoản
-                </h3>
-                
-                <div class="info-item">
-                    <span class="info-label">Tên đăng nhập</span>
-                    <span class="info-value">{{ user.username }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Email</span>
-                    <span class="info-value">{{ user.email }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Họ và tên</span>
-                    <span class="info-value">{{ user.first_name }} {{ user.last_name }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Vai trò</span>
-                    <span class="role-badge {% if user.is_admin %}admin{% else %}user{% endif %}">
-                        {% if user.is_admin %}
-                            <i class="fas fa-crown"></i>
-                        {% else %}
-                            <i class="fas fa-user"></i>
-                        {% endif %}
-                        {{ user.get_role_display }}
-                    </span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Ngày tham gia</span>
-                    <span class="info-value">{{ user.date_joined|date:"d/m/Y H:i" }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Lần cuối online</span>
-                    <span class="info-value">
-                        {% if user.last_login %}
-                            {{ user.last_login|date:"d/m/Y H:i" }}
-                        {% else %}
-                            Chưa đăng nhập
-                        {% endif %}
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <h3>
-                    <i class="fas fa-bolt"></i>
-                    Thao tác nhanh
-                </h3>
-                
-                <a href="{% url 'chat_advanced' %}" class="quick-btn">
-                    <i class="fas fa-comment"></i>
-                    Chat AI
-                </a>
-                
-                <a href="{% url 'profile' %}" class="quick-btn">
-                    <i class="fas fa-user-edit"></i>
-                    Chỉnh sửa profile
-                </a>
-                
-                {% if user.is_admin %}
-                <a href="{% url 'users_management' %}" class="quick-btn">
-                    <i class="fas fa-users"></i>
-                    Quản lý users
-                </a>
-                {% endif %}
-                
-                <a href="{% url 'logout' %}" class="quick-btn" style="color: #ef4444;">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Đăng xuất
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Admin Stats -->
-    {% if user.is_admin %}
-    <div class="stats-grid">
-        <div class="col-6 col-md-3">
-            <div class="stat-item">
-                <div class="stat-number">{{ total_users }}</div>
-                <div class="stat-label">Tổng người dùng</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-item">
-                <div class="stat-number">{{ active_sessions|default:0 }}</div>
-                <div class="stat-label">Phiên hoạt động</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-item">
-                <div class="stat-number">
-                    <i class="fas fa-check-circle" style="color: #10a37f;"></i>
-                </div>
-                <div class="stat-label">Hệ thống</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-item">
-                <div class="stat-number">
-                    <i class="fas fa-check-circle" style="color: #10a37f;"></i>
-                </div>
-                <div class="stat-label">Online</div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dynamic greeting & date
+    const dateEl = document.getElementById('liveDate');
+    const greetingEl = document.getElementById('greetingText');
+    const now = new Date();
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    if (dateEl) {
+        dateEl.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+    }
+
+    const hour = now.getHours();
+    let timeGreeting = 'Good morning';
+    if (hour >= 12 && hour < 18) {
+        timeGreeting = 'Good afternoon';
+    } else if (hour >= 18) {
+        timeGreeting = 'Good evening';
+    }
+    const username = "{{ user.first_name|default:user.username }}";
+    if (greetingEl) {
+        greetingEl.textContent = `${timeGreeting}, ${username}`;
+    }
+
+    // Auto submit dropzone file
+    const fileInput = document.getElementById('dashFileInput');
+    const form = document.getElementById('dashUploadForm');
+    if (fileInput && form) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                form.submit();
+            }
+        });
+    }
+
+    // Drag and drop for hero dropzone
+    const dropzone = document.getElementById('dashboardDropzone');
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('drag-over');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0 && fileInput) {
+                fileInput.files = files;
+                form.submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

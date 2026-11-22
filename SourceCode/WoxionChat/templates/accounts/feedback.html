@@ -1,581 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot Survey Widget</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
-        #survey-container {
-            width: 450px; /* Chiều rộng của widget */
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            box-sizing: border-box;
-        }
-        #survey-header {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-        #question-display {
-            min-height: 80px;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-            color: #555;
-            line-height: 1.5;
-        }
-        #options-container {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .option-btn {
-            background-color: #f0f0f0;
-            color: #333;
-            border: 1px solid #ccc;
-            padding: 12px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            text-align: left;
-            transition: background-color 0.2s, border-color 0.2s;
-            position: relative; /* Cho checkbox/radio */
-        }
-        .option-btn.selected {
-            background-color: #e0f0e0;
-            border-color: #4CAF50;
-            font-weight: bold;
-        }
-        .option-btn:hover {
-            background-color: #e9e9e9;
-        }
-        .text-input-field {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            margin-top: 10px;
-        }
-        #nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-        }
-        .nav-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: background-color 0.2s;
-        }
-        .nav-btn:hover {
-            background-color: #45a049;
-        }
-        .nav-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        #thank-you-message {
-            text-align: center;
-            font-size: 1.3em;
-            color: #4CAF50;
-            font-weight: bold;
-            margin-top: 50px;
-            display: none; /* Ban đầu ẩn */
-        }
+{% extends 'accounts/base.html' %}
+{% load static %}
 
-        #countdown-text {
-            font-size: 1.1em;
-            color: #666;
-            margin: 15px 0;
-            font-weight: normal;
-        }
+{% block title %}WoxionChat - Feedback{% endblock %}
 
-        #countdown {
-            font-weight: bold;
-            color: #4CAF50;
-            font-size: 1.2em;
-        }
-
-        /* Styles cho checkbox/radio trong nút */
-        .option-btn input[type="radio"],
-        .option-btn input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .custom-radio, .custom-checkbox {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #555;
-            border-radius: 50%; /* Cho radio */
-            margin-right: 10px;
-            vertical-align: middle;
-            position: relative;
-        }
-        .custom-checkbox {
-            border-radius: 3px; /* Cho checkbox */
-        }
-        .option-btn input[type="radio"]:checked + .custom-radio:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #4CAF50;
-        }
-        .option-btn input[type="checkbox"]:checked + .custom-checkbox:after {
-            content: '✔';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #4CAF50;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-    <div id="survey-container">
-        <div id="survey-header">Khảo Sát Chatbot</div>
-        <div id="question-display"></div>
-        <div id="options-container"></div>
-        <input type="text" id="text-input" class="text-input-field" style="display:none;" placeholder="Vui lòng nhập câu trả lời...">
-
-        <div id="nav-buttons">
-            <button id="prev-btn" class="nav-btn" disabled>Quay lại</button>
-            <button id="next-btn" class="nav-btn">Tiếp theo</button>
+{% block content %}
+<div class="main-content-scroll" style="max-width: 800px;">
+    <!-- Page Header -->
+    <div class="page-header-row" style="margin-bottom: 28px;">
+        <div>
+            <h1 class="page-heading">User Feedback</h1>
+            <p class="page-subheading">Help us improve WoxionChat document analysis and retrieval accuracy.</p>
         </div>
-        <div id="thank-you-message">Cảm ơn bạn đã hoàn thành khảo sát!</div>
     </div>
 
-    <script>
-        // --- Định nghĩa các câu hỏi khảo sát (Giữ nguyên như trong Python code, nhưng có thêm field 'key') ---
-        const SURVEY_QUESTIONS = {
-            "q1_overall_satisfaction": { "key": "q1_overall_satisfaction", "text": "Nhìn chung, bạn hài lòng đến mức độ nào với lần tương tác gần đây nhất của mình với chatbot?", "options": { "1": "1 - Rất không hài lòng", "2": "2 - Không hài lòng", "3": "3 - Bình thường", "4": "4 - Hài lòng", "5": "5 - Rất hài lòng" }, "db_field": "overall_satisfaction", "type": "rating" },
-            "q2_ease_of_use": { "key": "q2_ease_of_use", "text": "Bạn thấy việc sử dụng chatbot có dễ dàng không?", "options": { "1": "1 - Rất khó", "2": "2 - Khó", "3": "3 - Bình thường", "4": "4 - Dễ", "5": "5 - Rất dễ" }, "db_field": "ease_of_use", "type": "rating" },
-            "q3_time_saving": { "key": "q3_time_saving", "text": "Bạn có cảm thấy chatbot đã tiết kiệm thời gian của bạn trong quá trình tương tác không?", "options": { "1": "1 - Hoàn toàn không (tốn thời gian hơn)", "2": "2 - Ít tiết kiệm thời gian", "3": "3 - Không ảnh hưởng nhiều", "4": "4 - Tiết kiệm thời gian", "5": "5 - Rất tiết kiệm thời gian" }, "db_field": "time_saving", "type": "rating" },
-            "q4_recommendation": { "key": "q4_recommendation", "text": "Bạn có sẵn lòng giới thiệu chatbot của chúng tôi cho người khác không?", "options": { "1": "1 - Chắc chắn không", "2": "2 - Không chắc chắn", "3": "3 - Bình thường", "4": "4 - Có thể", "5": "5 - Chắc chắn có" }, "db_field": "recommendation", "type": "rating" },
-            "q5_understanding_accuracy": { "key": "q5_understanding_accuracy", "text": "Chatbot đã hiểu chính xác câu hỏi hoặc yêu cầu của bạn đến mức độ nào?", "options": { "1": "1 - Hoàn toàn không chính xác", "2": "2 - Kém chính xác", "3": "3 - Tương đối chính xác", "4": "4 - Chính xác", "5": "5 - Cực kỳ chính xác" }, "db_field": "understanding_accuracy", "type": "rating" },
-            "q6_clarification_prompts": { "key": "q6_clarification_prompts", "text": "Khi chatbot không hiểu yêu cầu của bạn, nó có đưa ra các câu hỏi làm rõ hoặc gợi ý phù hợp không?", "options": { "1": "1 - Hoàn toàn không", "2": "2 - Hầu như không", "3": "3 - Thỉnh thoảng", "4": "4 - Thường xuyên", "5": "5 - Luôn luôn" }, "db_field": "clarification_prompts", "type": "rating" },
-            "q7_info_clarity": { "key": "q7_info_clarity", "text": "Thông tin do chatbot cung cấp có rõ ràng và dễ hiểu không?", "options": { "1": "1 - Hoàn toàn không rõ ràng", "2": "2 - Khó hiểu", "3": "3 - Tương đối rõ ràng", "4": "4 - Rõ ràng", "5": "5 - Rất rõ ràng" }, "db_field": "info_clarity", "type": "rating" },
-            "q8_info_completeness": { "key": "q8_info_completeness", "text": "Thông tin do chatbot cung cấp có đầy đủ và toàn diện không?", "options": { "1": "1 - Hoàn toàn không đầy đủ", "2": "2 - Ít đầy đủ", "3": "3 - Khá đầy đủ", "4": "4 - Đầy đủ", "5": "5 - Rất đầy đủ" }, "db_field": "info_completeness", "type": "rating" },
-            "q9_info_trustworthiness": { "key": "q9_info_trustworthiness", "text": "Bạn có cảm thấy tin tưởng vào tính chính xác của thông tin mà chatbot cung cấp không?", "options": { "1": "1 - Hoàn toàn không tin tưởng", "2": "2 - Ít tin tưởng", "3": "3 - Tương đối tin tưởng", "4": "4 - Tin tưởng", "5": "5 - Rất tin tưởng" }, "db_field": "info_trustworthiness", "type": "rating" },
-            "q10_response_speed": { "key": "q10_response_speed", "text": "Tốc độ phản hồi của chatbot có đáp ứng kỳ vọng của bạn không?", "options": { "1": "1 - Chậm hơn nhiều so với kỳ vọng", "2": "2 - Chậm hơn kỳ vọng", "3": "3 - Đáp ứng vừa đủ kỳ vọng", "4": "4 - Nhanh hơn kỳ vọng", "5": "5 - Nhanh hơn nhiều so với kỳ vọng" }, "db_field": "response_speed", "type": "rating" },
-            "q11_problem_solving_usefulness": { "key": "q11_problem_solving_usefulness", "text": "Chatbot đã hữu ích đến mức độ nào trong việc giải quyết thắc mắc hoặc vấn đề của bạn?", "options": { "1": "1 - Hoàn toàn không hữu ích", "2": "2 - Ít hữu ích", "3": "3 - Khá hữu ích", "4": "4 - Hữu ích", "5": "5 - Cực kỳ hữu ích" }, "db_field": "problem_solving_usefulness", "type": "rating" },
-            "q12_instant_resolution": { "key": "q12_instant_resolution", "text": "Chatbot có thể giải quyết vấn đề của bạn ngay lập tức không (không cần chuyển tiếp đến người thật)?", "options": { "1": "1 - Hoàn toàn không thể", "2": "2 - Hầu như không thể", "3": "3 - Thỉnh thoảng có thể", "4": "4 - Thường xuyên có thể", "5": "5 - Luôn luôn có thể" }, "db_field": "instant_resolution", "type": "rating" },
-            "q13_next_steps_guidance": { "key": "q13_next_steps_guidance", "text": "Khi chatbot không thể giải quyết vấn đề của bạn, nó có đưa ra các lựa chọn hoặc bước tiếp theo phù hợp không (ví dụ: liên hệ nhân viên hỗ trợ, FAQ)?", "options": { "1": "1 - Hoàn toàn không", "2": "2 - Hầu như không", "3": "3 - Thỉnh thoảng", "4": "4 - Thường xuyên", "5": "5 - Luôn luôn" }, "db_field": "next_steps_guidance", "type": "rating" },
-            "q14_channel_transfer_comfort": { "key": "q14_channel_transfer_comfort", "text": "Bạn cảm thấy dễ chịu đến mức độ nào với việc chatbot chuyển hướng bạn đến một kênh hỗ trợ khác khi cần?", "options": { "1": "1 - Hoàn toàn không dễ chịu", "2": "2 - Ít dễ chịu", "3": "3 - Bình thường", "4": "4 - Dễ chịu", "5": "5 - Rất dễ chịu" }, "db_field": "channel_transfer_comfort", "type": "rating" },
-            "q15_final_solution_satisfaction": { "key": "q15_final_solution_satisfaction", "text": "Bạn có cảm thấy hài lòng với giải pháp hoặc thông tin cuối cùng mà bạn nhận được thông qua tương tác với chatbot không?", "options": { "1": "1 - Rất không hài lòng", "2": "2 - Không hài lòng", "3": "3 - Bình thường", "4": "4 - Hài lòng", "5": "5 - Rất hài lòng" }, "db_field": "final_solution_satisfaction", "type": "rating" },
-            "q16_interface_usability": { "key": "q16_interface_usability", "text": "Giao diện chatbot có dễ nhìn và dễ điều hướng không?", "options": { "1": "1 - Hoàn toàn không", "2": "2 - Khá khó", "3": "3 - Trung bình", "4": "4 - Dễ", "5": "5 - Rất dễ" }, "db_field": "interface_usability", "type": "rating" },
-            "q17_communication_style": { "key": "q17_communication_style", "text": "Cách giao tiếp của chatbot (từ ngữ, giọng điệu) có phù hợp và dễ chịu không?", "options": { "1": "1 - Hoàn toàn không phù hợp", "2": "2 - Ít phù hợp", "3": "3 - Trung bình", "4": "4 - Phù hợp", "5": "5 - Rất phù hợp" }, "db_field": "communication_style", "type": "rating" },
-            "q18_friendliness": { "key": "q18_friendliness", "text": "Bạn có cảm thấy chatbot thân thiện trong quá trình tương tác không?", "options": { "1": "1 - Hoàn toàn không thân thiện", "2": "2 - Ít thân thiện", "3": "3 - Trung bình", "4": "4 - Thân thiện", "5": "5 - Rất thân thiện" }, "db_field": "friendliness", "type": "rating" },
-            "q19_personalization": { "key": "q19_personalization", "text": "Bạn có cảm thấy chatbot cá nhân hóa được phản hồi cho trường hợp của bạn không?", "options": { "1": "1 - Hoàn toàn không (quá chung chung)", "2": "2 - Ít cá nhân hóa", "3": "3 - Bình thường", "4": "4 - Cá nhân hóa", "5": "5 - Rất cá nhân hóa" }, "db_field": "personalization", "type": "rating" },
-            "q20_professionalism": { "key": "q20_professionalism", "text": "Bạn có cảm thấy chatbot đã giải quyết vấn đề của bạn một cách chuyên nghiệp không?", "options": { "1": "1 - Hoàn toàn không chuyên nghiệp", "2": "2 - Ít chuyên nghiệp", "3": "3 - Trung bình", "4": "4 - Chuyên nghiệp", "5": "5 - Rất chuyên nghiệp" }, "db_field": "professionalism", "type": "rating" },
-            "q21_frustration_level": { "key": "q21_frustration_level", "text": "Bạn có cảm thấy frustration (thất vọng/bực bội) khi tương tác với chatbot không?", "options": { "1": "1 - Rất thường xuyên", "2": "2 - Thường xuyên", "3": "3 - Thỉnh thoảng", "4": "4 - Hiếm khi", "5": "5 - Hầu như không bao giờ" }, "db_field": "frustration_level", "type": "rating" },
-            "q22_desired_features": { "key": "q22_desired_features", "text": "Những tính năng nào bạn muốn chatbot của chúng tôi có thêm trong tương lai?", "options": { "A": "Khả năng ghi nhớ lịch sử cuộc trò chuyện", "B": "Khả năng tự động điền form/thực hiện giao dịch", "C": "Hỗ trợ đa ngôn ngữ", "D": "Tích hợp với các hệ thống/ứng dụng khác", "E": "Gửi tài liệu/file đính kèm", "F": "Khác" }, "db_field": "desired_features", "type": "multiple_choice_with_other" },
-            "q23_receive_notifications": { "key": "q23_receive_notifications", "text": "Bạn có muốn nhận thông báo hoặc cập nhật từ chatbot về các tính năng mới không?", "options": { "A": "Có", "B": "Không" }, "db_field": "receive_notifications", "type": "single_choice" },
-            "q24_reason_for_use": { "key": "q24_reason_for_use", "text": "Lý do chính bạn sử dụng chatbot ngày hôm nay là gì?", "options": { "A": "Tìm kiếm thông tin", "B": "Giải quyết một vấn đề/sự cố", "C": "Thực hiện một yêu cầu", "D": "Trao đổi chung", "E": "Khác" }, "db_field": "reason_for_use", "type": "multiple_choice_with_other" },
-            "q25_previous_use": { "key": "q25_previous_use", "text": "Bạn đã từng sử dụng chatbot của chúng tôi trước đây chưa?", "options": { "A": "Có", "B": "Không" }, "db_field": "previous_use", "type": "single_choice" },
-            "q26_device_used": { "key": "q26_device_used", "text": "Bạn đã sử dụng thiết bị nào để tương tác với chatbot?", "options": { "A": "Máy tính để bàn/Laptop", "B": "Điện thoại di động", "C": "Máy tính bảng", "D": "Khác" }, "db_field": "device_used", "type": "single_choice" },
-            "q27_age_group": { "key": "q27_age_group", "text": "Bạn thuộc nhóm tuổi nào?", "options": { "A": "Dưới 18", "B": "18-24", "C": "25-34", "D": "35-44", "E": "45-54", "F": "55 trở lên" }, "db_field": "age_group", "type": "single_choice" },
-            "q_other_desired_features_text": { "key": "q_other_desired_features_text", "text": "Vui lòng ghi rõ tính năng khác bạn mong muốn:", "db_field": "other_desired_features_text", "type": "text_input", "depends_on": { "q22_desired_features": "F" } },
-            "q_other_reason_for_use_text": { "key": "q_other_reason_for_use_text", "text": "Vui lòng ghi rõ lý do khác bạn sử dụng chatbot:", "db_field": "other_reason_for_use_text", "type": "text_input", "depends_on": { "q24_reason_for_use": "E" } }
-        };
+    <!-- Survey Card -->
+    <div class="woxion-card" style="padding: 32px;">
+        <div id="surveyAlert" class="woxion-alert" style="display: none;"></div>
 
-        const SURVEY_QUESTION_ORDER = [
-            "q1_overall_satisfaction", "q2_ease_of_use", "q3_time_saving", "q4_recommendation",
-            "q5_understanding_accuracy", "q6_clarification_prompts", "q7_info_clarity", "q8_info_completeness",
-            "q9_info_trustworthiness", "q10_response_speed", "q11_problem_solving_usefulness",
-            "q12_instant_resolution", "q13_next_steps_guidance", "q14_channel_transfer_comfort",
-            "q15_final_solution_satisfaction", "q16_interface_usability", "q17_communication_style",
-            "q18_friendliness", "q19_personalization", "q20_professionalism", "q21_frustration_level",
-            "q22_desired_features", "q23_receive_notifications", "q24_reason_for_use", "q25_previous_use",
-            "q26_device_used", "q27_age_group",
-            "q_other_desired_features_text", "q_other_reason_for_use_text"
-        ];
+        <form id="feedbackSurveyForm" onsubmit="handleFeedbackSubmit(event)">
+            {% csrf_token %}
+            <input type="hidden" id="feedbackUserId" value="{{ user_id }}">
+            <input type="hidden" id="feedbackSessionId" value="{{ session_id }}">
 
+            <!-- Question 1: Overall Satisfaction -->
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label" style="font-size: 0.95rem; margin-bottom: 10px;">
+                    1. How satisfied are you with WoxionChat's answers and source citations?
+                </label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="satisfaction" value="5" checked style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Very Satisfied (5★)
+                    </label>
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="satisfaction" value="4" style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Satisfied (4★)
+                    </label>
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="satisfaction" value="3" style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Neutral (3★)
+                    </label>
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="satisfaction" value="2" style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Dissatisfied (2★)
+                    </label>
+                </div>
+            </div>
 
-        const questionDisplay = document.getElementById('question-display');
-        const optionsContainer = document.getElementById('options-container');
-        const textInput = document.getElementById('text-input');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const thankYouMessage = document.getElementById('thank-you-message');
-        const surveyContainer = document.getElementById('survey-container');
+            <!-- Question 2: Accuracy of OCR -->
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label" style="font-size: 0.95rem; margin-bottom: 10px;">
+                    2. Did the OCR accurately capture text and tables from your uploaded documents?
+                </label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="ocr_accuracy" value="accurate" checked style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Yes, highly accurate
+                    </label>
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="ocr_accuracy" value="minor_issues" style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Minor typos / formatting issues
+                    </label>
+                    <label class="prompt-chip" style="cursor: pointer;">
+                        <input type="radio" name="ocr_accuracy" value="poor" style="accent-color: var(--brand-yellow); margin-right: 6px;">
+                        Missing text / poor recognition
+                    </label>
+                </div>
+            </div>
 
-        // === DJANGO INTEGRATION ===
-        // Sử dụng Django API thay vì Flask service
-        const BACKEND_API_URL = '/api/feedback/submit/'; // Django API endpoint
-        
-        // Lấy user data từ Django context (được truyền từ view)
-        const USER_ID = '{{ user_id }}';  // Từ Django context
-        const SESSION_ID = '{{ session_id }}';  // Từ Django context
-        const USERNAME = '{{ user.username }}';  // Từ Django context
-        
-        // Hiển thị thông tin user
-        console.log('🔗 Feedback Survey initialized for:', USERNAME, 'User ID:', USER_ID);
+            <!-- Question 3: Comments -->
+            <div class="form-group" style="margin-bottom: 28px;">
+                <label class="form-label" for="feedbackComment" style="font-size: 0.95rem;">
+                    3. What features or improvements would you like to see next?
+                </label>
+                <textarea id="feedbackComment" class="form-control-warm" rows="4" placeholder="Your thoughts, bug reports or suggestions..."></textarea>
+            </div>
 
-        let currentQuestionIndex = 0;
-        let userAnswers = {}; // Lưu trữ tất cả câu trả lời ở frontend
-        let dynamicQuestionOrder = [...SURVEY_QUESTION_ORDER]; // Thứ tự câu hỏi động
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+                <a href="{% url 'dashboard' %}" class="btn-link-muted" style="text-decoration: none;">Cancel</a>
+                <button type="submit" class="btn-primary-yellow" id="submitFeedbackBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Submit Feedback</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+async function handleFeedbackSubmit(e) {
+    e.preventDefault();
+    const alertBox = document.getElementById('surveyAlert');
+    const submitBtn = document.getElementById('submitFeedbackBtn');
+    submitBtn.disabled = true;
 
-        function displayQuestion() {
-            if (currentQuestionIndex >= dynamicQuestionOrder.length) {
-                // Đã hết câu hỏi
-                submitSurvey();
-                return;
-            }
+    const satisfaction = document.querySelector('input[name="satisfaction"]:checked')?.value || "5";
+    const ocr_accuracy = document.querySelector('input[name="ocr_accuracy"]:checked')?.value || "accurate";
+    const comments = document.getElementById('feedbackComment').value.trim();
+    const user_id = document.getElementById('feedbackUserId').value;
+    const session_id = document.getElementById('feedbackSessionId').value;
 
-            const currentQKey = dynamicQuestionOrder[currentQuestionIndex];
-            const questionInfo = SURVEY_QUESTIONS[currentQKey];
-
-            // Xử lý câu hỏi phụ thuộc (depends_on)
-            if (questionInfo.depends_on) {
-                const depQKey = Object.keys(questionInfo.depends_on)[0];
-                const depOptionKey = questionInfo.depends_on[depQKey];
-                
-                const depQInfo = SURVEY_QUESTIONS[depQKey];
-                const prevAnswer = userAnswers[depQInfo.db_field];
-
-                // Kiểm tra nếu câu trả lời trước đó kích hoạt câu hỏi hiện tại
-                // Nếu prevAnswer là mảng (multi-choice), kiểm tra xem có chứa option key không
-                if (!(Array.isArray(prevAnswer) ? prevAnswer.includes(depQInfo.options[depOptionKey]) : prevAnswer === depQInfo.options[depOptionKey])) {
-                    currentQuestionIndex++; // Bỏ qua câu hỏi này
-                    displayQuestion(); // Hiển thị câu hỏi tiếp theo
-                    return;
+    try {
+        const res = await fetch("{% url 'api_submit_feedback' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                user_id: user_id,
+                session_id: session_id,
+                survey_data: {
+                    satisfaction: satisfaction,
+                    ocr_accuracy: ocr_accuracy,
+                    comments: comments
                 }
-            }
-
-
-            questionDisplay.textContent = questionInfo.text;
-            optionsContainer.innerHTML = '';
-            textInput.style.display = 'none'; // Ẩn input text mặc định
-            optionsContainer.style.display = 'flex'; // Hiển thị container nút mặc định
-
-            if (questionInfo.type === 'rating' || questionInfo.type === 'single_choice') {
-                for (const key in questionInfo.options) {
-                    const label = questionInfo.options[key];
-                    const btn = document.createElement('button');
-                    btn.classList.add('option-btn');
-                    
-                    // Tạo input radio ẩn
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = currentQKey;
-                    radio.value = key; // Giá trị để lưu (1,2,3,4,5 hoặc A,B,C)
-                    
-                    // Tạo custom radio/checkbox UI
-                    const customSpan = document.createElement('span');
-                    customSpan.classList.add(questionInfo.type === 'rating' ? 'custom-radio' : 'custom-checkbox');
-
-                    btn.appendChild(radio);
-                    btn.appendChild(customSpan);
-                    btn.appendChild(document.createTextNode(label)); // Thêm text node cho label
-
-                    btn.onclick = () => {
-                        // Bỏ chọn tất cả các nút khác trong cùng câu hỏi
-                        document.querySelectorAll(`#options-container .option-btn`).forEach(b => {
-                            b.classList.remove('selected');
-                            b.querySelector('input').checked = false; // Bỏ check input radio
-                        });
-                        btn.classList.add('selected');
-                        radio.checked = true; // Chọn input radio
-                        userAnswers[questionInfo.db_field] = questionInfo.type === 'rating' ? parseInt(key) : questionInfo.options[key];
-                        updateNavButtons();
-                    };
-
-                    // Nếu đã có câu trả lời trước đó, chọn lại
-                    if (userAnswers[questionInfo.db_field] === (questionInfo.type === 'rating' ? parseInt(key) : questionInfo.options[key])) {
-                        btn.classList.add('selected');
-                        radio.checked = true;
-                    }
-
-                    optionsContainer.appendChild(btn);
-                }
-            } else if (questionInfo.type === 'multiple_choice_with_other') {
-                for (const key in questionInfo.options) {
-                    const label = questionInfo.options[key];
-                    const btn = document.createElement('button');
-                    btn.classList.add('option-btn');
-
-                    // Tạo input checkbox ẩn
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.name = currentQKey;
-                    checkbox.value = key; // Giá trị để lưu (A,B,C,F)
-                    
-                    const customSpan = document.createElement('span');
-                    customSpan.classList.add('custom-checkbox');
-
-                    btn.appendChild(checkbox);
-                    btn.appendChild(customSpan);
-                    btn.appendChild(document.createTextNode(label));
-
-                    btn.onclick = () => {
-                        checkbox.checked = !checkbox.checked; // Đảo ngược trạng thái check
-                        btn.classList.toggle('selected', checkbox.checked); // Thêm/bỏ class selected
-
-                        // Cập nhật userAnswers cho multi-choice
-                        let currentSelections = userAnswers[questionInfo.db_field] || [];
-                        const optionValue = questionInfo.options[key];
-                        if (checkbox.checked) {
-                            if (!currentSelections.includes(optionValue)) {
-                                currentSelections.push(optionValue);
-                            }
-                        } else {
-                            currentSelections = currentSelections.filter(item => item !== optionValue);
-                        }
-                        userAnswers[questionInfo.db_field] = currentSelections;
-
-                        // Xử lý chèn câu hỏi "Khác" nếu chọn
-                        if (key === 'F' || key === 'E') { // 'E' cho reason_for_use
-                            const otherQKey = currentQKey === "q22_desired_features" ? "q_other_desired_features_text" : "q_other_reason_for_use_text";
-                            const otherQIndex = dynamicQuestionOrder.indexOf(otherQKey);
-                            if (checkbox.checked && otherQIndex === -1) {
-                                dynamicQuestionOrder.splice(currentQuestionIndex + 1, 0, otherQKey);
-                            } else if (!checkbox.checked && otherQIndex !== -1) {
-                                dynamicQuestionOrder.splice(otherQIndex, 1);
-                                delete userAnswers[SURVEY_QUESTIONS[otherQKey].db_field]; // Xóa câu trả lời phụ nếu bỏ chọn "Khác"
-                            }
-                        }
-                        updateNavButtons();
-                    };
-
-                    // Nếu đã có câu trả lời trước đó, chọn lại
-                    let prevSelections = userAnswers[questionInfo.db_field] || [];
-                    if (prevSelections.includes(questionInfo.options[key])) {
-                        btn.classList.add('selected');
-                        checkbox.checked = true;
-                    }
-                    optionsContainer.appendChild(btn);
-                }
-            } else if (questionInfo.type === 'text_input') {
-                textInput.style.display = 'block';
-                optionsContainer.style.display = 'none'; // Ẩn container nút
-                textInput.value = userAnswers[questionInfo.db_field] || '';
-                textInput.focus();
-            }
-            updateNavButtons();
-        }
-
-        function saveCurrentAnswer() {
-            const currentQKey = dynamicQuestionOrder[currentQuestionIndex];
-            const questionInfo = SURVEY_QUESTIONS[currentQKey];
-
-            if (questionInfo.type === 'text_input') {
-                userAnswers[questionInfo.db_field] = textInput.value.trim();
-            }
-            // Các loại khác đã được lưu trong hàm `onclick` của nút
-        }
-
-        function updateNavButtons() {
-            prevBtn.disabled = currentQuestionIndex === 0;
-            if (currentQuestionIndex === dynamicQuestionOrder.length - 1) {
-                nextBtn.textContent = 'Hoàn thành';
-            } else {
-                nextBtn.textContent = 'Tiếp theo';
-            }
-            // Điều kiện để nút tiếp theo không bị disabled nếu câu trả lời chưa có
-            const currentQKey = dynamicQuestionOrder[currentQuestionIndex];
-            const questionInfo = SURVEY_QUESTIONS[currentQKey];
-            
-            let isAnswered = false;
-            if (questionInfo.type === 'text_input') {
-                isAnswered = textInput.value.trim() !== '';
-            } else if (questionInfo.type === 'multiple_choice_with_other') {
-                isAnswered = userAnswers[questionInfo.db_field] && userAnswers[questionInfo.db_field].length > 0;
-            } else { // rating hoặc single_choice
-                isAnswered = userAnswers.hasOwnProperty(questionInfo.db_field);
-            }
-            nextBtn.disabled = !isAnswered;
-
-            if (currentQuestionIndex >= dynamicQuestionOrder.length) {
-                nextBtn.disabled = false; // Luôn cho phép hoàn thành nếu đã hết câu hỏi
-            }
-        }
-
-
-        async function submitSurvey() {
-            surveyContainer.style.display = 'none';
-            thankYouMessage.style.display = 'block';
-
-            try {
-                // Lấy CSRF token từ Django
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                                  document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || 
-                                  getCookie('csrftoken');
-                
-                const payload = {
-                    user_id: USER_ID,
-                    session_id: SESSION_ID,
-                    answers: userAnswers // Gửi tất cả câu trả lời
-                };
-                
-                console.log('📤 Submitting feedback:', payload);
-                
-                const response = await fetch(BACKEND_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,  // Django CSRF protection
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                const data = await response.json();
-                console.log('📥 Survey submission response:', data);
-
-                if (response.ok && data.status === 'success') {
-                    thankYouMessage.innerHTML = `
-                        <h2>🎉 Cảm ơn ${USERNAME}!</h2>
-                        <p>Phản hồi của bạn đã được ghi nhận thành công.</p>
-                        <p>Chúng tôi sẽ sử dụng thông tin này để cải thiện chatbot.</p>
-                        <p id="countdown-text">Tự động chuyển về trang chủ sau <span id="countdown">3</span> giây...</p>
-                        <button onclick="window.location.href='/'" class="nav-btn" style="margin-top: 20px;">
-                            Quay về trang chủ ngay
-                        </button>
-                    `;
-                    
-                    // Bắt đầu countdown và tự động redirect
-                    let countdownTime = 3;
-                    const countdownElement = document.getElementById('countdown');
-                    
-                    const countdownInterval = setInterval(() => {
-                        countdownTime--;
-                        if (countdownElement) {
-                            countdownElement.textContent = countdownTime;
-                        }
-                        
-                        if (countdownTime <= 0) {
-                            clearInterval(countdownInterval);
-                            window.location.href = '/';
-                        }
-                    }, 1000);
-                    
-                } else {
-                    throw new Error(data.message || data.error || 'Unknown error');
-                }
-
-            } catch (error) {
-                console.error('❌ Error submitting survey:', error);
-                
-                // Hiển thị lỗi và cho phép thử lại
-                thankYouMessage.innerHTML = `
-                    <h2>⚠️ Có lỗi xảy ra</h2>
-                    <p>Không thể gửi phản hồi: ${error.message}</p>
-                    <button onclick="retrySubmit()" class="nav-btn" style="margin-top: 20px;">
-                        Thử lại
-                    </button>
-                    <button onclick="window.location.href='/'" class="nav-btn" style="margin-top: 10px;">
-                        Quay về trang chủ
-                    </button>
-                `;
-            }
-        }
-        
-        // Function to retry submission
-        function retrySubmit() {
-            thankYouMessage.style.display = 'none';
-            surveyContainer.style.display = 'block';
-        }
-        
-        // Function to get CSRF cookie
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        prevBtn.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                saveCurrentAnswer(); // Lưu câu trả lời hiện tại trước khi quay lại
-                currentQuestionIndex--;
-                // Xử lý các câu hỏi "Khác" nếu quay lại và không còn liên quan
-                const prevQKey = dynamicQuestionOrder[currentQuestionIndex];
-                const prevQInfo = SURVEY_QUESTIONS[prevQKey];
-                if (prevQInfo.type === 'multiple_choice_with_other') {
-                    const otherQKey = prevQKey === "q22_desired_features" ? "q_other_desired_features_text" : "q_other_reason_for_use_text";
-                    const otherQIndex = dynamicQuestionOrder.indexOf(otherQKey);
-                    // Nếu quay lại từ câu hỏi "khác" và nó không còn liên quan nữa, bỏ nó đi
-                    // (chỉ khi nó được chèn động VÀ câu trả lời kích hoạt nó đã bị bỏ chọn)
-                    if (otherQIndex !== -1 && !((userAnswers[prevQInfo.db_field] || []).includes(prevQInfo.options['F'] || prevQInfo.options['E']))) {
-                        dynamicQuestionOrder.splice(otherQIndex, 1);
-                        delete userAnswers[SURVEY_QUESTIONS[otherQKey].db_field];
-                        // Nếu câu hỏi hiện tại là câu hỏi "Khác" bị xóa, quay lại thêm 1 bước
-                        if (currentQuestionIndex >= otherQIndex) {
-                             currentQuestionIndex--;
-                        }
-                    }
-                }
-                displayQuestion();
-            }
+            })
         });
 
-        nextBtn.addEventListener('click', () => {
-            saveCurrentAnswer(); // Lưu câu trả lời hiện tại trước khi chuyển tiếp
-
-            // Kiểm tra xem câu hỏi hiện tại đã được trả lời chưa
-            const currentQKey = dynamicQuestionOrder[currentQuestionIndex];
-            const questionInfo = SURVEY_QUESTIONS[currentQKey];
-            
-            let isAnswered = false;
-            if (questionInfo.type === 'text_input') {
-                isAnswered = textInput.value.trim() !== '';
-            } else if (questionInfo.type === 'multiple_choice_with_other') {
-                isAnswered = userAnswers[questionInfo.db_field] && userAnswers[questionInfo.db_field].length > 0;
-            } else { // rating hoặc single_choice
-                isAnswered = userAnswers.hasOwnProperty(questionInfo.db_field);
-            }
-
-            if (!isAnswered) {
-                alert('Vui lòng trả lời câu hỏi trước khi tiếp tục.');
-                return;
-            }
-
-            currentQuestionIndex++;
-            displayQuestion();
-        });
-
-        // Lắng nghe sự kiện input text để cập nhật nút Next
-        textInput.addEventListener('input', updateNavButtons);
-
-
-        // Khởi tạo khảo sát khi tải trang
-        displayQuestion();
-
-    </script>
-</body>
-</html>
+        alertBox.style.display = 'flex';
+        if (res.ok) {
+            alertBox.className = 'woxion-alert success';
+            alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Thank you! Your feedback has been submitted successfully.';
+            document.getElementById('feedbackSurveyForm').reset();
+        } else {
+            alertBox.className = 'woxion-alert error';
+            alertBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to submit feedback. Please try again.';
+        }
+    } catch (err) {
+        alertBox.style.display = 'flex';
+        alertBox.className = 'woxion-alert error';
+        alertBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Network error submitting feedback.';
+    } finally {
+        submitBtn.disabled = false;
+    }
+}
+</script>
+{% endblock %}

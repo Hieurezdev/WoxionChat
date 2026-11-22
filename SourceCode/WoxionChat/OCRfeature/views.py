@@ -27,8 +27,8 @@ def get_authenticated_user(request):
     return user
 
 def ocr_home(request):
-    """OCR feature home/dashboard view"""
-    logger.info("You're currently at: /ocr/")
+    """OCR feature home view - redirect to documents list"""
+    return redirect('OCRfeature:list_files')
     try:
         # Get authenticated user from session
         user = get_authenticated_user(request)

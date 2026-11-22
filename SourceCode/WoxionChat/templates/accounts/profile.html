@@ -1,107 +1,192 @@
 {% extends 'accounts/base.html' %}
+{% load static %}
 
-{% block title %}Thông tin cá nhân - WoxionChat{% endblock %}
+{% block title %}WoxionChat - Settings{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card mt-4">
-            <div class="card-header bg-info text-white">
-                <h4><i class="fas fa-user-edit me-2"></i>Thông tin cá nhân</h4>
+<div class="main-content-scroll" style="max-width: 1000px;">
+    <!-- Page Header -->
+    <div class="page-header-row" style="margin-bottom: 28px;">
+        <div>
+            <h1 class="page-heading">Settings</h1>
+            <p class="page-subheading">Manage your profile, password and how WoxionChat looks for you.</p>
+        </div>
+    </div>
+
+    <!-- Settings Layout Grid: Left Subnav + Right Cards Column -->
+    <div class="settings-layout-grid">
+        <!-- Subnav -->
+        <div class="settings-subnav">
+            <button type="button" class="settings-subnav-btn active" onclick="scrollToSection('profileSection', this)">
+                <i class="far fa-user"></i>
+                <span>Profile</span>
+            </button>
+            <button type="button" class="settings-subnav-btn" onclick="scrollToSection('passwordSection', this)">
+                <i class="fas fa-lock"></i>
+                <span>Password</span>
+            </button>
+            <button type="button" class="settings-subnav-btn" onclick="scrollToSection('interfaceSection', this)">
+                <i class="fas fa-sliders-h"></i>
+                <span>Interface</span>
+            </button>
+            <button type="button" class="settings-subnav-btn" onclick="scrollToSection('sessionSection', this)">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Session</span>
+            </button>
+        </div>
+
+        <!-- Right Content Cards -->
+        <div class="settings-sections-col">
+            <!-- 1. Profile Section -->
+            <div class="settings-section-card" id="profileSection">
+                <h3 class="settings-section-title">Profile</h3>
+                <p class="settings-section-subtext">This information appears on your account.</p>
+
+                <!-- Avatar Row -->
+                <div class="profile-photo-row">
+                    <div class="profile-avatar-large user-avatar" style="font-size: 1.5rem;">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <div class="photo-actions">
+                        <button type="button" class="btn-sm-outline" onclick="alert('Photo upload dialog');">Change photo</button>
+                        <button type="button" class="btn-link-muted" onclick="alert('Photo removed');">Remove</button>
+                    </div>
+                </div>
+
+                <!-- Profile Form -->
+                <form id="profileForm" onsubmit="handleProfileSubmit(event)">
+                    {% csrf_token %}
+                    <div id="profileAlertBox" class="woxion-alert" style="display: none;"></div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label" for="profileFirstName">First name</label>
+                            <input type="text" id="profileFirstName" class="form-control-warm" value="{{ user.first_name|default:'Amara' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="profileLastName">Last name</label>
+                            <input type="text" id="profileLastName" class="form-control-warm" value="{{ user.last_name|default:'Okafor' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label" for="profileUsername">Username</label>
+                            <input type="text" id="profileUsername" class="form-control-warm" value="{{ user.username|default:'amara.okafor' }}" readonly style="opacity: 0.8; cursor: not-allowed;">
+                            <span class="form-help-text">Usernames can't be changed.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" class="form-control-warm" value="{{ user.email|default:'amara@northwind.co' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="settings-card-actions">
+                        <a href="{% url 'dashboard' %}" class="btn-link-muted" style="text-decoration: none;">Cancel</a>
+                        <button type="submit" class="btn-primary-yellow">
+                            <span>Save changes</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <form id="profile-form" action="{% url 'api_profile' %}">
-                            {% csrf_token %}
-                            
-                            <div id="form-errors" class="alert alert-danger" style="display: none;"></div>
-                            <div id="form-success" class="alert alert-success" style="display: none;"></div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-user me-1"></i>Tên
-                                    </label>
-                                    {{ form.first_name }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-user me-1"></i>Họ
-                                    </label>
-                                    {{ form.last_name }}
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">
-                                    <i class="fas fa-envelope me-1"></i>Email
-                                </label>
-                                {{ form.email }}
-                            </div>
-                            
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary me-2">
-                                    <i class="fas fa-times me-1"></i>Hủy
-                                </a>
-                                <button type="button" id="update-profile-btn" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i>Cập nhật
-                                </button>
-                            </div>
-                        </form>
+
+            <!-- 2. Password Section -->
+            <div class="settings-section-card" id="passwordSection">
+                <h3 class="settings-section-title">Password</h3>
+                <p class="settings-section-subtext">Use at least 8 characters, mixing letters and numbers.</p>
+
+                <form id="passwordForm" onsubmit="handlePasswordSubmit(event)">
+                    {% csrf_token %}
+                    <div id="passwordAlertBox" class="woxion-alert" style="display: none;"></div>
+
+                    <div class="form-group" style="max-width: 380px;">
+                        <label class="form-label" for="currentPassword">Current password</label>
+                        <input type="password" id="currentPassword" class="form-control-warm" placeholder="••••••••••••" required>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card bg-light">
-                            <div class="card-header">
-                                <h6><i class="fas fa-info-circle me-1"></i>Thông tin tài khoản</h6>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <li><strong>Tên đăng nhập:</strong> {{ user.username }}</li>
-                                    <li><strong>Ngày tham gia:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</li>
-                                    <li><strong>Lần cuối online:</strong> 
-                                        {% if user.last_login %}
-                                            {{ user.last_login|date:"d/m/Y H:i" }}
-                                        {% else %}
-                                            Chưa đăng nhập
-                                        {% endif %}
-                                    </li>
-                                    <li><strong>Trạng thái:</strong> 
-                                        {% if user.is_active %}
-                                            <span class="badge bg-success">Hoạt động</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Không hoạt động</span>
-                                        {% endif %}
-                                    </li>
-                                </ul>
-                            </div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label" for="newPassword">New password</label>
+                            <input type="password" id="newPassword" class="form-control-warm" placeholder="••••••••" required oninput="checkPasswordMatch()">
                         </div>
-                        
-                        <div class="card bg-info bg-opacity-25 mt-3">
-                            <div class="card-body text-center">
-                                <i class="fas fa-key fa-2x text-info mb-2"></i>
-                                <h6>Đổi mật khẩu</h6>
-                                <p class="small">Để bảo mật tài khoản của bạn</p>
-                                <a href="{% url 'change_password' %}" class="btn btn-info btn-sm">
-                                    <i class="fas fa-lock me-1"></i>Đổi mật khẩu
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="card bg-success bg-opacity-25 mt-3">
-                            <div class="card-body text-center">
-                                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
-                                <h6>Bảo mật tài khoản</h6>
-                                <p class="small">Luôn giữ tài khoản an toàn</p>
-                                <div class="d-flex flex-column gap-2">
-                                    <a href="{% url 'change_password' %}" class="btn btn-outline-success btn-sm">
-                                        <i class="fas fa-key me-1"></i>Đổi mật khẩu
-                                    </a>
-                                    <small class="text-muted">Cập nhật mật khẩu định kỳ</small>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm new password</label>
+                            <input type="password" id="confirmPassword" class="form-control-warm" placeholder="••••••••" required oninput="checkPasswordMatch()">
+                            <span class="form-error-text" id="pwMismatchError" style="display: none;">
+                                <i class="fas fa-exclamation-circle"></i> Passwords don't match.
+                            </span>
                         </div>
                     </div>
+
+                    <div class="settings-card-actions">
+                        <button type="submit" class="btn-sm-outline" style="padding: 9px 18px; font-size: 0.88rem;">
+                            <span>Update password</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 3. Interface Section -->
+            <div class="settings-section-card" id="interfaceSection">
+                <h3 class="settings-section-title">Interface</h3>
+                <p class="settings-section-subtext">Saved in this browser only.</p>
+
+                <div class="settings-toggle-row">
+                    <div class="toggle-info">
+                        <h5>Start with sidebar collapsed</h5>
+                        <p>Gives the chat more room on smaller screens.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleCollapse" onchange="handleInterfaceChange('collapse', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-toggle-row">
+                    <div class="toggle-info">
+                        <h5>Send message with Enter</h5>
+                        <p>Use Shift + Enter for a new line.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleEnterSend" checked onchange="handleInterfaceChange('enter_send', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-toggle-row">
+                    <div class="toggle-info">
+                        <h5>Open Context panel by default</h5>
+                        <p>Show selected documents beside the chat on wide screens.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleContextOpen" checked onchange="handleInterfaceChange('context_open', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-toggle-row">
+                    <div class="toggle-info">
+                        <h5>Message density</h5>
+                        <p>Spacing between chat messages.</p>
+                    </div>
+                    <select class="sort-select" id="selectDensity" onchange="handleInterfaceChange('density', this.value)">
+                        <option value="comfortable" selected>Comfortable</option>
+                        <option value="compact">Compact</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 4. Session Section -->
+            <div class="settings-section-card" id="sessionSection">
+                <h3 class="settings-section-title">Session</h3>
+                <div class="session-info-row">
+                    <div class="session-text">
+                        Signed in as <strong>{{ user.email|default:user.username }}</strong> • since today, 09:12
+                    </div>
+                    <a href="{% url 'logout' %}" class="btn-signout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign out</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -109,112 +194,116 @@
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
+{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("🚀 Profile page JavaScript loaded");
-    
-    const updateButton = document.getElementById('update-profile-btn');
-    const profileForm = document.getElementById('profile-form');
-    const errorContainer = document.getElementById('form-errors');
-    const successContainer = document.getElementById('form-success');
-
-    if (updateButton && profileForm) {
-        updateButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            console.log("🔄 Starting profile update...");
-            
-            // Disable button and show loading
-            updateButton.disabled = true;
-            updateButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang cập nhật...';
-            
-            // Hide previous messages
-            errorContainer.style.display = 'none';
-            successContainer.style.display = 'none';
-            
-            // Get form data
-            const formData = new FormData(profileForm);
-            const payload = {};
-            
-            // Collect only non-empty fields
-            formData.forEach((value, key) => {
-                if (key !== 'csrfmiddlewaretoken' && value.trim() !== '') {
-                    payload[key] = value.trim();
-                }
-            });
-            
-            console.log("📤 Sending PATCH request with data:", payload);
-            
-            if (Object.keys(payload).length === 0) {
-                alert('Vui lòng nhập ít nhất một thông tin để cập nhật.');
-                updateButton.disabled = false;
-                updateButton.innerHTML = '<i class="fas fa-save me-1"></i>Cập nhật';
-                return;
-            }
-
-            // Send PATCH request
-            fetch(profileForm.action, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                console.log("📥 Response status:", response.status);
-                
-                if (!response.ok) {
-                    return response.json().then(err => Promise.reject(err));
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("✅ Success:", data);
-                
-                // Show success message
-                successContainer.innerHTML = `<i class="fas fa-check me-1"></i>${data.message || 'Cập nhật thành công!'}`;
-                successContainer.style.display = 'block';
-                
-                // Optionally update displayed user info
-                if (data.user) {
-                    // Update any displayed user information on the page
-                    console.log("Updated user data:", data.user);
-                }
-            })
-            .catch(error => {
-                console.error("❌ Error:", error);
-                
-                // Show error messages
-                let errorHtml = '';
-                if (typeof error === 'object' && error !== null) {
-                    if (error.error) {
-                        errorHtml = `<i class="fas fa-exclamation-triangle me-1"></i>${error.error}`;
-                    } else {
-                        errorHtml = '<ul class="mb-0">';
-                        for (const [field, messages] of Object.entries(error)) {
-                            const fieldMessages = Array.isArray(messages) ? messages : [messages];
-                            errorHtml += `<li><strong>${field}:</strong> ${fieldMessages.join(', ')}</li>`;
-                        }
-                        errorHtml += '</ul>';
-                    }
-                } else {
-                    errorHtml = `<i class="fas fa-exclamation-triangle me-1"></i>Có lỗi xảy ra: ${error}`;
-                }
-                
-                errorContainer.innerHTML = errorHtml;
-                errorContainer.style.display = 'block';
-            })
-            .finally(() => {
-                // Re-enable button
-                updateButton.disabled = false;
-                updateButton.innerHTML = '<i class="fas fa-save me-1"></i>Cập nhật';
-            });
-        });
-    } else {
-        console.error("❌ Required elements not found");
+function scrollToSection(sectionId, btn) {
+    document.querySelectorAll('.settings-subnav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = document.getElementById(sectionId);
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+function checkPasswordMatch() {
+    const p1 = document.getElementById('newPassword').value;
+    const p2 = document.getElementById('confirmPassword').value;
+    const err = document.getElementById('pwMismatchError');
+    const input = document.getElementById('confirmPassword');
+
+    if (p2 && p1 !== p2) {
+        err.style.display = 'block';
+        input.classList.add('error');
+    } else {
+        err.style.display = 'none';
+        input.classList.remove('error');
+    }
+}
+
+async function handleProfileSubmit(e) {
+    e.preventDefault();
+    const alertBox = document.getElementById('profileAlertBox');
+    const first_name = document.getElementById('profileFirstName').value;
+    const last_name = document.getElementById('profileLastName').value;
+    const email = document.getElementById('profileEmail').value;
+
+    try {
+        const res = await fetch("{% url 'api_profile' %}", {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ first_name, last_name, email })
+        });
+        const data = await res.json();
+        alertBox.style.display = 'flex';
+        if (res.ok) {
+            alertBox.className = 'woxion-alert success';
+            alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Profile updated successfully!';
+        } else {
+            alertBox.className = 'woxion-alert error';
+            alertBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.error || 'Failed to update profile.'}`;
+        }
+    } catch (err) {
+        alertBox.style.display = 'flex';
+        alertBox.className = 'woxion-alert error';
+        alertBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error connecting to server.';
+    }
+}
+
+async function handlePasswordSubmit(e) {
+    e.preventDefault();
+    const alertBox = document.getElementById('passwordAlertBox');
+    const old_password = document.getElementById('currentPassword').value;
+    const new_password1 = document.getElementById('newPassword').value;
+    const new_password2 = document.getElementById('confirmPassword').value;
+
+    if (new_password1 !== new_password2) {
+        checkPasswordMatch();
+        return;
+    }
+
+    try {
+        const res = await fetch("{% url 'api_change_password' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ old_password, new_password1, new_password2 })
+        });
+        const data = await res.json();
+        alertBox.style.display = 'flex';
+        if (res.ok && data.success) {
+            alertBox.className = 'woxion-alert success';
+            alertBox.innerHTML = '<i class="fas fa-check-circle"></i> ' + (data.message || 'Password changed successfully!');
+            document.getElementById('passwordForm').reset();
+        } else {
+            alertBox.className = 'woxion-alert error';
+            alertBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message || data.error || 'Password update failed.'}`;
+        }
+    } catch (err) {
+        alertBox.style.display = 'flex';
+        alertBox.className = 'woxion-alert error';
+        alertBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error connecting to server.';
+    }
+}
+
+function handleInterfaceChange(key, value) {
+    localStorage.setItem('woxion_pref_' + key, value);
+    if (key === 'collapse') {
+        const sidebar = document.getElementById('appSidebar');
+        if (sidebar) {
+            if (value) sidebar.classList.add('collapsed');
+            else sidebar.classList.remove('collapsed');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const isCollapsed = localStorage.getItem('woxion_sidebar_collapsed') === 'true';
+    document.getElementById('toggleCollapse').checked = isCollapsed;
 });
 </script>
 {% endblock %}

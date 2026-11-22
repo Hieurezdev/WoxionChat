@@ -84,8 +84,10 @@ def logout_user(request):
 
 
 def home_view(request):
-    """Trang chủ - Home page"""
+    """Trang chủ - Landing page"""
     user = get_current_user(request)
+    if user and request.path != '/landing/' and request.GET.get('landing') != '1' and request.GET.get('preview') != '1':
+        return redirect('dashboard')
     
     context = {
         'user': user,
@@ -190,14 +192,73 @@ def dashboard_view(request):
         messages.error(request, f'Lỗi kết nối cơ sở dữ liệu: {str(e)}')
         total_users = 0
         active_sessions = 0
+
+    user_files = []
+    total_docs = 0
+    ready_docs = 0
+    processing_docs = 0
+    uploaded_docs = 0
+    failed_docs = 0
+    try:
+        from OCRfeature.models import UploadedFile
+        from OCRfeature.services import OCRResultFactory
+        user_files_qs = UploadedFile.objects(uploader_id=str(user.id), is_active=True).order_by('-uploaded_at')
+        total_docs = user_files_qs.count()
+        user_files = list(user_files_qs[:5])
+        for f in user_files_qs:
+            status = 'uploaded'
+            try:
+                results = OCRResultFactory.get_results_for_source_file(str(f.id))
+                if results and len(results) > 0:
+                    status = results[0].status
+            except Exception:
+                status = 'uploaded'
+            
+            if status in ['completed', 'ready']:
+                ready_docs += 1
+            elif status in ['processing', 'pending']:
+                processing_docs += 1
+            elif status == 'failed':
+                failed_docs += 1
+            else:
+                uploaded_docs += 1
+    except Exception as e:
+        logger.warning(f"Error fetching user files in dashboard: {e}")
     
     context = {
         'user': user,
         'total_users': total_users,
         'active_sessions': active_sessions,
-        'dashboard_type': 'user'
+        'dashboard_type': 'user',
+        'user_files': user_files,
+        'total_docs': total_docs,
+        'ready_docs': ready_docs,
+        'processing_docs': processing_docs,
+        'uploaded_docs': uploaded_docs,
+        'failed_docs': failed_docs,
     }
     return render(request, 'accounts/dashboard.html', context)
+
+
+@login_required
+def chat_history_view(request):
+    """Trang lịch sử chat - Chat History"""
+    user = get_current_user(request)
+    if not user:
+        return redirect('login')
+    
+    total_docs = 0
+    try:
+        from OCRfeature.models import UploadedFile
+        total_docs = UploadedFile.objects(uploader_id=str(user.id), is_active=True).count()
+    except Exception:
+        pass
+        
+    context = {
+        'user': user,
+        'total_docs': total_docs
+    }
+    return render(request, 'accounts/chat_history.html', context)
 
 
 @admin_required
